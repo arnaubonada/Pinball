@@ -9,6 +9,7 @@
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
+	sBall = SDL_Rect{ 34,0,16,16 };
 	circle = box = rick = NULL;
 	ray_on = false;
 	sensed = false;
@@ -31,8 +32,53 @@ bool ModuleSceneIntro::Start()
 	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");*/
 
 	background = App->textures->Load("pinball/Background.png");
+	spritesheet = App->textures->Load("pinball/Spritesheet.png");
 
 	//sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
+	ball = App->physics->CreateCircle(50, 50, 16);
+
+
+	//Bumper 1
+	b2BodyDef bumper1;
+	bumper1.type = b2_kinematicBody; //this will be a dynamic body
+	bumper1.position.Set(PIXEL_TO_METERS(232), PIXEL_TO_METERS(88)); //a little to the left
+
+	bumper_1 = App->physics->world->CreateBody(&bumper1);
+	b2CircleShape shape_bumper1;
+	shape_bumper1.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //position, relative to body position
+	shape_bumper1.m_radius = PIXEL_TO_METERS(30); //radius
+	b2FixtureDef f_bumper1;
+	f_bumper1.shape = &shape_bumper1; //this is a pointer to the shape above
+	f_bumper1.restitution = 1, 1;
+	bumper_1->CreateFixture(&f_bumper1); //add a fixture to the body
+
+	//Bumper 2
+	b2BodyDef bumper2;
+	bumper2.type = b2_kinematicBody; //this will be a dynamic body
+	bumper2.position.Set(PIXEL_TO_METERS(168), PIXEL_TO_METERS(167)); //a little to the left
+
+	bumper_2 = App->physics->world->CreateBody(&bumper2);
+	b2CircleShape shape_bumper2;
+	shape_bumper2.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //position, relative to body position
+	shape_bumper2.m_radius = PIXEL_TO_METERS(30); //radius
+	b2FixtureDef f_bumper2;
+	f_bumper2.shape = &shape_bumper2; //this is a pointer to the shape above
+	f_bumper2.restitution = 1, 1;
+	bumper_2->CreateFixture(&f_bumper2); //add a fixture to the body
+
+	//Bumper 3
+	b2BodyDef bumper3;
+	bumper3.type = b2_kinematicBody; //this will be a dynamic body
+	bumper3.position.Set(PIXEL_TO_METERS(296), PIXEL_TO_METERS(167)); //a little to the left
+
+	bumper_3 = App->physics->world->CreateBody(&bumper3);
+	b2CircleShape shape_bumper3;
+	shape_bumper3.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //position, relative to body position
+	shape_bumper3.m_radius = PIXEL_TO_METERS(30); //radius
+	b2FixtureDef f_bumper3;
+	f_bumper3.shape = &shape_bumper3;
+	f_bumper3.restitution = 1, 1;//this is a pointer to the shape above
+	bumper_3->CreateFixture(&f_bumper3); //add a fixture to the body
 
 	return ret;
 }
@@ -48,11 +94,18 @@ bool ModuleSceneIntro::CleanUp()
 // Update: draw background
 update_status ModuleSceneIntro::Update()
 {
+	p2List_item<PhysBody*>* chain = ricks.getFirst();
+	while (chain != nullptr) {
+		b2Body* body = chain->data->body;
+		chain->data->body->GetWorld()->DestroyBody(body);
+		chain = chain->next;
+	}
+	ricks.clear();
 
 	App->renderer->Blit(background, 0, 0);
 
 	// Pivot 0, 0
-	int Background2[98] = {
+	int Background[98] = {
 		239, 239,
 		238, 49,
 		237, 29,
@@ -104,64 +157,10 @@ update_status ModuleSceneIntro::Update()
 		238, 239
 	};
 
-	//if(App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
-	//{
-	//	ray_on = !ray_on;
-	//	ray.x = App->input->GetMouseX();
-	//	ray.y = App->input->GetMouseY();
-	//}
+	ricks.add(App->physics->CreateChain(0, 0, Background, 98));
 
-	//if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
-	//{
-	//	circles.add(App->physics->CreateCircle(App->input->GetMouseX(), App->input->GetMouseY(), 25));
-	//	circles.getLast()->data->listener = this;
-	//}
+	App->renderer->Blit(spritesheet, ball->body->GetPosition().x * 25 - 8, ball->body->GetPosition().y * 25 - 8, &sBall);
 
-	//if(App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
-	//{
-	//	boxes.add(App->physics->CreateRectangle(App->input->GetMouseX(), App->input->GetMouseY(), 100, 50));
-	//}
-
-	//if(App->input->GetKey(SDL_SCANCODE_3) == KEY_DOWN)
-	//{
-	//	// Pivot 0, 0
-	//	int rick_head[64] = {
-	//		14, 36,
-	//		42, 40,
-	//		40, 0,
-	//		75, 30,
-	//		88, 4,
-	//		94, 39,
-	//		111, 36,
-	//		104, 58,
-	//		107, 62,
-	//		117, 67,
-	//		109, 73,
-	//		110, 85,
-	//		106, 91,
-	//		109, 99,
-	//		103, 104,
-	//		100, 115,
-	//		106, 121,
-	//		103, 125,
-	//		98, 126,
-	//		95, 137,
-	//		83, 147,
-	//		67, 147,
-	//		53, 140,
-	//		46, 132,
-	//		34, 136,
-	//		38, 126,
-	//		23, 123,
-	//		30, 114,
-	//		10, 102,
-	//		29, 90,
-	//		0, 75,
-	//		30, 62
-	//	};
-
-	//	ricks.add(App->physics->CreateChain(App->input->GetMouseX(), App->input->GetMouseY(), rick_head, 64));
-	//}
 
 	// Prepare for raycast ------------------------------------------------------
 	
@@ -175,53 +174,44 @@ update_status ModuleSceneIntro::Update()
 	// All draw functions ------------------------------------------------------
 	p2List_item<PhysBody*>* c = circles.getFirst();
 
-	//while(c != NULL)
-	//{
-	//	int x, y;
-	//	c->data->GetPosition(x, y);
-	//	if(c->data->Contains(App->input->GetMouseX(), App->input->GetMouseY()))
-	//		App->renderer->Blit(circle, x, y, NULL, 1.0f, c->data->GetRotation());
-	//	c = c->next;
-	//}
+	while(c != NULL)
+	{
+		int x, y;
+		c->data->GetPosition(x, y);
+		if(c->data->Contains(App->input->GetMouseX(), App->input->GetMouseY()))
+			App->renderer->Blit(circle, x, y, NULL, 1.0f, c->data->GetRotation());
+		c = c->next;
+	}
 
-	//c = boxes.getFirst();
+	c = boxes.getFirst();
 
-	//while(c != NULL)
-	//{
-	//	int x, y;
-	//	c->data->GetPosition(x, y);
-	//	App->renderer->Blit(box, x, y, NULL, 1.0f, c->data->GetRotation());
-	//	if(ray_on)
-	//	{
-	//		int hit = c->data->RayCast(ray.x, ray.y, mouse.x, mouse.y, normal.x, normal.y);
-	//		if(hit >= 0)
-	//			ray_hit = hit;
-	//	}
-	//	c = c->next;
-	//}
+	while(c != NULL)
+	{
+		int x, y;
+		c->data->GetPosition(x, y);
+		App->renderer->Blit(box, x, y, NULL, 1.0f, c->data->GetRotation());
+		if(ray_on)
+		{
+			int hit = c->data->RayCast(ray.x, ray.y, mouse.x, mouse.y, normal.x, normal.y);
+			if(hit >= 0)
+				ray_hit = hit;
+		}
+		c = c->next;
+	}
 
-	//c = ricks.getFirst();
-
-	//while(c != NULL)
-	//{
-	//	int x, y;
-	//	c->data->GetPosition(x, y);
-	//	App->renderer->Blit(rick, x, y, NULL, 1.0f, c->data->GetRotation());
-	//	c = c->next;
-	//}
 
 	//// ray -----------------
-	//if(ray_on == true)
-	//{
-	//	fVector destination(mouse.x-ray.x, mouse.y-ray.y);
-	//	destination.Normalize();
-	//	destination *= ray_hit;
+	if(ray_on == true)
+	{
+		fVector destination(mouse.x-ray.x, mouse.y-ray.y);
+		destination.Normalize();
+		destination *= ray_hit;
 
-	//	App->renderer->DrawLine(ray.x, ray.y, ray.x + destination.x, ray.y + destination.y, 255, 255, 255);
+		App->renderer->DrawLine(ray.x, ray.y, ray.x + destination.x, ray.y + destination.y, 255, 255, 255);
 
-	//	if(normal.x != 0.0f)
-	//		App->renderer->DrawLine(ray.x + destination.x, ray.y + destination.y, ray.x + destination.x + normal.x * 25.0f, ray.y + destination.y + normal.y * 25.0f, 100, 255, 100);
-	//}
+		if(normal.x != 0.0f)
+			App->renderer->DrawLine(ray.x + destination.x, ray.y + destination.y, ray.x + destination.x + normal.x * 25.0f, ray.y + destination.y + normal.y * 25.0f, 100, 255, 100);
+	}
 
 	return UPDATE_CONTINUE;
 }
@@ -231,16 +221,5 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	int x, y;
 
 	App->audio->PlayFx(bonus_fx);
-		
-	/*if(bodyA)
-	{
-		bodyA->GetPosition(x, y);
-		App->renderer->DrawCircle(x, y, 50, 100, 100, 100);
-	}
-
-	if(bodyB)
-	{
-		bodyB->GetPosition(x, y);
-		App->renderer->DrawCircle(x, y, 50, 100, 100, 100);
-	}*/
+	
 }
