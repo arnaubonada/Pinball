@@ -41,4 +41,5 @@ public:
 	bool ray_on;
 
 	SDL_Rect sBall;
+	SDL_Rect sBumper;
 };

@@ -10,6 +10,7 @@
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	sBall = SDL_Rect{ 34,0,16,16 };
+	sBumper = SDL_Rect{ 37,79,28,28 };
 	circle = box = rick = NULL;
 	ray_on = false;
 	sensed = false;
@@ -46,7 +47,7 @@ bool ModuleSceneIntro::Start()
 	bumper_1 = App->physics->world->CreateBody(&bumper1);
 	b2CircleShape shape_bumper1;
 	shape_bumper1.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //position, relative to body position
-	shape_bumper1.m_radius = PIXEL_TO_METERS(30); //radius
+	shape_bumper1.m_radius = PIXEL_TO_METERS(28); //radius
 	b2FixtureDef f_bumper1;
 	f_bumper1.shape = &shape_bumper1; //this is a pointer to the shape above
 	f_bumper1.restitution = 1, 1;
@@ -60,7 +61,7 @@ bool ModuleSceneIntro::Start()
 	bumper_2 = App->physics->world->CreateBody(&bumper2);
 	b2CircleShape shape_bumper2;
 	shape_bumper2.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //position, relative to body position
-	shape_bumper2.m_radius = PIXEL_TO_METERS(30); //radius
+	shape_bumper2.m_radius = PIXEL_TO_METERS(28); //radius
 	b2FixtureDef f_bumper2;
 	f_bumper2.shape = &shape_bumper2; //this is a pointer to the shape above
 	f_bumper2.restitution = 1, 1;
@@ -74,7 +75,7 @@ bool ModuleSceneIntro::Start()
 	bumper_3 = App->physics->world->CreateBody(&bumper3);
 	b2CircleShape shape_bumper3;
 	shape_bumper3.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //position, relative to body position
-	shape_bumper3.m_radius = PIXEL_TO_METERS(30); //radius
+	shape_bumper3.m_radius = PIXEL_TO_METERS(28); //radius
 	b2FixtureDef f_bumper3;
 	f_bumper3.shape = &shape_bumper3;
 	f_bumper3.restitution = 1, 1;//this is a pointer to the shape above
@@ -159,7 +160,13 @@ update_status ModuleSceneIntro::Update()
 
 	ricks.add(App->physics->CreateChain(0, 0, Background, 98));
 
+	//print ball
 	App->renderer->Blit(spritesheet, ball->body->GetPosition().x * 25 - 8, ball->body->GetPosition().y * 25 - 8, &sBall);
+
+	//print blumpers
+	App->renderer->Blit(spritesheet, 232/2 - 14, 88/2 - 14, &sBumper);
+	App->renderer->Blit(spritesheet, 168 / 2 - 14, 167 / 2 - 14, &sBumper);
+	App->renderer->Blit(spritesheet, 296 / 2 - 14, 167 / 2 - 14, &sBumper);
 
 
 	// Prepare for raycast ------------------------------------------------------
