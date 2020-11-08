@@ -35,6 +35,7 @@ public:
 
 	SDL_Texture* background;
 	SDL_Texture* spritesheet;
+	SDL_Texture* spriteball;
 	SDL_Texture* circle;
 	SDL_Texture* box;
 	SDL_Texture* rick;

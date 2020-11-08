@@ -10,7 +10,7 @@
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	sBall = SDL_Rect{ 34,0,16,16 };
-	sBumper = SDL_Rect{ 37,79,28,28 };
+	sBumper = SDL_Rect{ 74,158,56,56 };
 	circle = box = rick = NULL;
 	ray_on = false;
 	sensed = false;
@@ -33,10 +33,11 @@ bool ModuleSceneIntro::Start()
 	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");*/
 
 	background = App->textures->Load("pinball/Background.png");
-	spritesheet = App->textures->Load("pinball/Spritesheet.png");
+	spritesheet = App->textures->Load("pinball/Spritesheet2.png");
+	spriteball = App->textures->Load("pinball/Spritesheet.png");
 
 	//sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
-	ball = App->physics->CreateCircle(50, 50, 16);
+	ball = App->physics->CreateCircle(100, 20, 8);
 
 
 
@@ -102,11 +103,11 @@ bool ModuleSceneIntro::Start()
 	slingshot_1 = App->physics->world->CreateBody(&slingshot1);
 
 	b2Vec2 vertices1[5];
-	vertices1[0].Set(PIXEL_TO_METERS(62), PIXEL_TO_METERS(266));
-	vertices1[1].Set(PIXEL_TO_METERS(77), PIXEL_TO_METERS(274));
-	vertices1[2].Set(PIXEL_TO_METERS(80), PIXEL_TO_METERS(270));
-	vertices1[3].Set(PIXEL_TO_METERS(66), PIXEL_TO_METERS(247));
-	vertices1[4].Set(PIXEL_TO_METERS(62), PIXEL_TO_METERS(249));
+	vertices1[0].Set(PIXEL_TO_METERS(62*2), PIXEL_TO_METERS(266*2));
+	vertices1[1].Set(PIXEL_TO_METERS(77*2), PIXEL_TO_METERS(274*2));
+	vertices1[2].Set(PIXEL_TO_METERS(80*2), PIXEL_TO_METERS(270*2));
+	vertices1[3].Set(PIXEL_TO_METERS(66*2), PIXEL_TO_METERS(247*2));
+	vertices1[4].Set(PIXEL_TO_METERS(62*2), PIXEL_TO_METERS(249*2));
 
 	b2PolygonShape shape_slingshot1;
 	shape_slingshot1.Set(vertices1, 5); //pass array to the shape
@@ -127,11 +128,11 @@ bool ModuleSceneIntro::Start()
 	slingshot_2 = App->physics->world->CreateBody(&slingshot2);
 
 	b2Vec2 vertices2[5];
-	vertices2[0].Set(PIXEL_TO_METERS(162), PIXEL_TO_METERS(266));
-	vertices2[1].Set(PIXEL_TO_METERS(147), PIXEL_TO_METERS(274));
-	vertices2[2].Set(PIXEL_TO_METERS(144), PIXEL_TO_METERS(270));
-	vertices2[3].Set(PIXEL_TO_METERS(157), PIXEL_TO_METERS(247));
-	vertices2[4].Set(PIXEL_TO_METERS(162), PIXEL_TO_METERS(249));
+	vertices2[0].Set(PIXEL_TO_METERS(162*2), PIXEL_TO_METERS(266*2));
+	vertices2[1].Set(PIXEL_TO_METERS(147*2), PIXEL_TO_METERS(274*2));
+	vertices2[2].Set(PIXEL_TO_METERS(144*2), PIXEL_TO_METERS(270*2));
+	vertices2[3].Set(PIXEL_TO_METERS(157*2), PIXEL_TO_METERS(247*2));
+	vertices2[4].Set(PIXEL_TO_METERS(162*2), PIXEL_TO_METERS(249*2));
 
 	b2PolygonShape shape_slingshot2;
 	shape_slingshot2.Set(vertices2, 5); //pass array to the shape
@@ -168,68 +169,206 @@ update_status ModuleSceneIntro::Update()
 
 	App->renderer->Blit(background, 0, 0);
 
-	// Pivot 0, 0
-	int Background[98] = {
-		239, 239,
-		238, 49,
-		237, 29,
-		232, 17,
-		225, 9,
-		215, 4,
-		56, 3,
-		44, 7,
-		36, 12,
-		29, 21,
-		24, 30,
-		20, 40,
-		18, 50,
-		16, 63,
-		16, 75,
-		14, 84,
-		9, 96,
-		8, 103,
-		10, 167,
-		14, 177,
-		19, 182,
-		27, 194,
-		26, 221,
-		17, 230,
-		16, 236,
-		17, 301,
-		45, 320,
-		178, 320,
-		205, 302,
-		206, 239,
-		204, 234,
-		197, 229,
-		197, 214,
-		204, 208,
-		210, 197,
-		213, 187,
-		214, 47,
-		210, 37,
-		204, 34,
-		196, 36,
-		181, 48,
-		178, 43,
-		194, 27,
-		201, 24,
-		209, 26,
-		218, 31,
-		224, 44,
-		224, 239,
-		238, 239
+	int Background[102] = {
+		480, 477,
+		478, 101,
+		477, 71,
+		464, 35,
+		450, 20,
+		428, 7,
+		114, 6,
+		93, 13,
+		79, 22,
+		65, 37,
+		55, 55,
+		47, 77,
+		40, 110,
+		35, 140,
+		34, 162,
+		31, 179,
+		25, 190,
+		19, 200,
+		19, 239,
+		19, 298,
+		22, 330,
+		30, 352,
+		52, 381,
+		53, 447,
+		35, 469,
+		35, 598,
+		90, 641,
+		90, 676,
+		361, 677,
+		361, 639,
+		411, 604,
+		412, 478,
+		397, 462,
+		397, 430,
+		412, 413,
+		425, 391,
+		428, 369,
+		427, 94,
+		424, 82,
+		414, 74,
+		400, 77,
+		362, 95,
+		353, 88,
+		390, 49,
+		413, 49,
+		430, 58,
+		439, 67,
+		447, 81,
+		449, 95,
+		447, 480,
+		480, 480
+	};
+	int Background1[26] = {
+		63, 113,
+		71, 83,
+		85, 59,
+		93, 45,
+		107, 38,
+		121, 38,
+		146, 60,
+		148, 75,
+		143, 83,
+		76, 150,
+		63, 144,
+		60, 127,
+		62, 113
+	};
+	int Background2[38] = {
+		386, 140,
+		376, 143,
+		371, 149,
+		371, 220,
+		367, 238,
+		353, 251,
+		328, 266,
+		293, 280,
+		293, 287,
+		303, 289,
+		306, 300,
+		296, 310,
+		298, 315,
+		312, 317,
+		375, 360,
+		386, 362,
+		396, 352,
+		396, 149,
+		389, 140
 	};
 
-	ricks.add(App->physics->CreateChain(0, 0, Background, 98));
+	int Background3[64] = {
+		76, 206,
+		82, 205,
+		90, 213,
+		97, 235,
+		103, 254,
+		114, 265,
+		132, 273,
+		151, 280,
+		157, 285,
+		144, 291,
+		141, 297,
+		147, 307,
+		158, 310,
+		159, 316,
+		146, 323,
+		111, 356,
+		101, 356,
+		76, 331,
+		73, 324,
+		77, 317,
+		68, 305,
+		67, 295,
+		76, 286,
+		75, 279,
+		67, 273,
+		68, 263,
+		77, 255,
+		77, 247,
+		66, 239,
+		66, 230,
+		73, 225,
+		73, 208
+	};
+
+	int Background4[16] = {
+		79, 520,
+		84, 518,
+		91, 522,
+		91, 570,
+		155, 602,
+		142, 617,
+		76, 581,
+		75, 522
+	};
+
+	int Background5[16] = {
+		292, 604,
+		307, 615,
+		369, 582,
+		370, 525,
+		363, 518,
+		357, 522,
+		355, 571,
+		294, 603
+	};
+
+	int Background6[18] = {
+		168, 355,
+		167, 395,
+		172, 402,
+		180, 402,
+		184, 392,
+		185, 354,
+		180, 349,
+		172, 349,
+		168, 355
+	};
+
+	int Background7[18] = {
+		216, 352,
+		216, 398,
+		220, 404,
+		226, 404,
+		230, 397,
+		231, 353,
+		228, 347,
+		222, 348,
+		217, 353
+	};
+
+	int Background8[18] = {
+		264, 356,
+		264, 395,
+		269, 402,
+		274, 402,
+		279, 394,
+		279, 356,
+		274, 347,
+		268, 347,
+		264, 356
+	};
+
+	ricks.add(App->physics->CreateChain(0, 0, Background, 102));
+	ricks.add(App->physics->CreateChain(0, 0, Background1, 26));
+	ricks.add(App->physics->CreateChain(0, 0, Background2, 38));
+	ricks.add(App->physics->CreateChain(0, 0, Background3, 64));
+	ricks.add(App->physics->CreateChain(0, 0, Background4, 16));
+	ricks.add(App->physics->CreateChain(0, 0, Background5, 16));
+	//ricks.add(App->physics->CreateChain(0, 0, Background6, 18));
+	//ricks.add(App->physics->CreateChain(0, 0, Background7, 18));
+	//ricks.add(App->physics->CreateChain(0, 0, Background8, 18));
 
 	//print ball
-	App->renderer->Blit(spritesheet, ball->body->GetPosition().x * 25 - 8, ball->body->GetPosition().y * 25 - 8, &sBall);
+	App->renderer->Blit(spriteball, ball->body->GetPosition().x * 50 - 8, ball->body->GetPosition().y * 50 - 8, &sBall);
 
 	//print blumpers
-	App->renderer->Blit(spritesheet, 232/2 - 14, 88/2 - 14, &sBumper);
-	App->renderer->Blit(spritesheet, 168 / 2 - 14, 167 / 2 - 14, &sBumper);
-	App->renderer->Blit(spritesheet, 296 / 2 - 14, 167 / 2 - 14, &sBumper);
+	App->renderer->Blit(spritesheet, 232 - 28, 88 - 28, &sBumper);
+	App->renderer->Blit(spritesheet, 168 - 28, 167 - 28, &sBumper);
+	App->renderer->Blit(spritesheet, 296 - 28, 167 - 28, &sBumper);
 
 
 	// Prepare for raycast ------------------------------------------------------
