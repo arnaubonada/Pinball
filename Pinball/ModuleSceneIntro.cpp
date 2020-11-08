@@ -39,9 +39,14 @@ bool ModuleSceneIntro::Start()
 	ball = App->physics->CreateCircle(50, 50, 16);
 
 
+
+	//----------------------BUMPERS---------------------
+
+
+
 	//Bumper 1
 	b2BodyDef bumper1;
-	bumper1.type = b2_kinematicBody; //this will be a dynamic body
+	bumper1.type = b2_staticBody; //this will be a dynamic body
 	bumper1.position.Set(PIXEL_TO_METERS(232), PIXEL_TO_METERS(88)); //a little to the left
 
 	bumper_1 = App->physics->world->CreateBody(&bumper1);
@@ -55,7 +60,7 @@ bool ModuleSceneIntro::Start()
 
 	//Bumper 2
 	b2BodyDef bumper2;
-	bumper2.type = b2_kinematicBody; //this will be a dynamic body
+	bumper2.type = b2_staticBody; //this will be a dynamic body
 	bumper2.position.Set(PIXEL_TO_METERS(168), PIXEL_TO_METERS(167)); //a little to the left
 
 	bumper_2 = App->physics->world->CreateBody(&bumper2);
@@ -69,17 +74,75 @@ bool ModuleSceneIntro::Start()
 
 	//Bumper 3
 	b2BodyDef bumper3;
-	bumper3.type = b2_kinematicBody; //this will be a dynamic body
+	bumper3.type = b2_staticBody; //this will be a dynamic body
 	bumper3.position.Set(PIXEL_TO_METERS(296), PIXEL_TO_METERS(167)); //a little to the left
 
 	bumper_3 = App->physics->world->CreateBody(&bumper3);
+
 	b2CircleShape shape_bumper3;
 	shape_bumper3.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //position, relative to body position
 	shape_bumper3.m_radius = PIXEL_TO_METERS(28); //radius
+
 	b2FixtureDef f_bumper3;
 	f_bumper3.shape = &shape_bumper3;
 	f_bumper3.restitution = 1, 1;//this is a pointer to the shape above
 	bumper_3->CreateFixture(&f_bumper3); //add a fixture to the body
+
+
+
+	//----------------------SLINGSHOTS---------------------
+
+
+
+	//Slingshot 1
+	b2BodyDef slingshot1;
+	slingshot1.type = b2_staticBody; //this will be a dynamic body
+	//slingshot1.position.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //a little to the left
+
+	slingshot_1 = App->physics->world->CreateBody(&slingshot1);
+
+	b2Vec2 vertices1[5];
+	vertices1[0].Set(PIXEL_TO_METERS(62), PIXEL_TO_METERS(266));
+	vertices1[1].Set(PIXEL_TO_METERS(77), PIXEL_TO_METERS(274));
+	vertices1[2].Set(PIXEL_TO_METERS(80), PIXEL_TO_METERS(270));
+	vertices1[3].Set(PIXEL_TO_METERS(66), PIXEL_TO_METERS(247));
+	vertices1[4].Set(PIXEL_TO_METERS(62), PIXEL_TO_METERS(249));
+
+	b2PolygonShape shape_slingshot1;
+	shape_slingshot1.Set(vertices1, 5); //pass array to the shape
+
+	b2FixtureDef fixture_slingshot1;
+	fixture_slingshot1.shape = &shape_slingshot1; //change the shape of the fixture
+	//slingshot1.position.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //in the middle
+
+	b2Body* dynamicBody2_l = App->physics->world->CreateBody(&slingshot1);
+	fixture_slingshot1.restitution = 2;
+	dynamicBody2_l->CreateFixture(&fixture_slingshot1); //add a fixture to the body
+	
+	//Slingshot 2
+	b2BodyDef slingshot2;
+	slingshot2.type = b2_staticBody; //this will be a dynamic body
+	//slingshot2.position.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //a little to the left
+
+	slingshot_2 = App->physics->world->CreateBody(&slingshot2);
+
+	b2Vec2 vertices2[5];
+	vertices2[0].Set(PIXEL_TO_METERS(162), PIXEL_TO_METERS(266));
+	vertices2[1].Set(PIXEL_TO_METERS(147), PIXEL_TO_METERS(274));
+	vertices2[2].Set(PIXEL_TO_METERS(144), PIXEL_TO_METERS(270));
+	vertices2[3].Set(PIXEL_TO_METERS(157), PIXEL_TO_METERS(247));
+	vertices2[4].Set(PIXEL_TO_METERS(162), PIXEL_TO_METERS(249));
+
+	b2PolygonShape shape_slingshot2;
+	shape_slingshot2.Set(vertices2, 5); //pass array to the shape
+
+	b2FixtureDef fixture_slingshot2;
+	fixture_slingshot2.shape = &shape_slingshot2; //change the shape of the fixture
+	//slingshot1.position.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //in the middle
+
+	b2Body* dynamicBody2_2 = App->physics->world->CreateBody(&slingshot2);
+	fixture_slingshot2.restitution = 2;
+	dynamicBody2_2->CreateFixture(&fixture_slingshot2); //add a fixture to the body
 
 	return ret;
 }

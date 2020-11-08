@@ -30,6 +30,8 @@ public:
 	b2Body* bumper_1;
 	b2Body* bumper_2;
 	b2Body* bumper_3;
+	b2Body* slingshot_1;
+	b2Body* slingshot_2;
 
 	SDL_Texture* background;
 	SDL_Texture* spritesheet;
