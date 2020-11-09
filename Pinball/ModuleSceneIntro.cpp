@@ -316,40 +316,31 @@ update_status ModuleSceneIntro::Update()
 		294, 603
 	};
 
-	int Background6[18] = {
+	int Background6[12] = {
+		176, 349,
+		183, 353,
+		183, 398,
+		176, 404,
+		168, 397,
 		168, 355,
-		167, 395,
-		172, 402,
-		180, 402,
-		184, 392,
-		185, 354,
-		180, 349,
-		172, 349,
-		168, 355
 	};
 
-	int Background7[18] = {
-		216, 352,
-		216, 398,
-		220, 404,
-		226, 404,
-		230, 397,
+	int Background7[12] = {
+		224, 347,
 		231, 353,
-		228, 347,
-		222, 348,
-		217, 353
+		231, 396,
+		224, 404,
+		216, 397,
+		216, 353,
 	};
 
-	int Background8[18] = {
-		264, 356,
-		264, 395,
-		269, 402,
-		274, 402,
-		279, 394,
-		279, 356,
-		274, 347,
-		268, 347,
-		264, 356
+	int Background8[12] = {
+		264, 355,
+		264, 396,
+		272, 403,
+		279, 396,
+		280, 355,
+		272, 349,
 	};
 
 	ricks.add(App->physics->CreateChain(0, 0, Background, 102));
@@ -358,9 +349,9 @@ update_status ModuleSceneIntro::Update()
 	ricks.add(App->physics->CreateChain(0, 0, Background3, 64));
 	ricks.add(App->physics->CreateChain(0, 0, Background4, 16));
 	ricks.add(App->physics->CreateChain(0, 0, Background5, 16));
-	//ricks.add(App->physics->CreateChain(0, 0, Background6, 18));
-	//ricks.add(App->physics->CreateChain(0, 0, Background7, 18));
-	//ricks.add(App->physics->CreateChain(0, 0, Background8, 18));
+	ricks.add(App->physics->CreateChain(0, 0, Background6, 12));
+	ricks.add(App->physics->CreateChain(0, 0, Background7, 12));
+	ricks.add(App->physics->CreateChain(0, 0, Background8, 12));
 
 	//print ball
 	App->renderer->Blit(spriteball, ball->body->GetPosition().x * 50 - 8, ball->body->GetPosition().y * 50 - 8, &sBall);
