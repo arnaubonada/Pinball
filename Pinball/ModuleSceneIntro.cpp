@@ -37,7 +37,7 @@ bool ModuleSceneIntro::Start()
 	spriteball = App->textures->Load("pinball/Spritesheet.png");
 
 	//sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
-	ball = App->physics->CreateCircle(100, 20, 8);
+	ball = App->physics->CreateCircle(95, 380, 8);
 
 
 
@@ -145,6 +145,7 @@ bool ModuleSceneIntro::Start()
 	fixture_slingshot2.restitution = 2;
 	dynamicBody2_2->CreateFixture(&fixture_slingshot2); //add a fixture to the body
 
+
 	return ret;
 }
 
@@ -168,6 +169,25 @@ update_status ModuleSceneIntro::Update()
 	ricks.clear();
 
 	App->renderer->Blit(background, 0, 0);
+
+	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
+	{
+		App->physics->leftFlipper->body->ApplyForceToCenter({0, -100 }, true);
+		App->physics->RevoluteJointLeft.lowerAngle = -15 * DEGTORAD;
+
+		App->physics->leftTopFlipper->body->ApplyForceToCenter({ 0, -100 }, true);
+		App->physics->RevoluteJointTopLeft.lowerAngle = -15 * DEGTORAD;
+		
+	}
+	if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
+	{
+		App->physics->rightFlipper->body->ApplyForceToCenter({ 0, -100 }, true);
+		App->physics->RevoluteJointLeft.lowerAngle = -15 * DEGTORAD;
+
+		App->physics->rightTopFlipper->body->ApplyForceToCenter({ 0, -100 }, true);
+		App->physics->RevoluteJointTopLeft.lowerAngle = -15 * DEGTORAD;
+
+	}
 
 	int Background[102] = {
 		480, 477,

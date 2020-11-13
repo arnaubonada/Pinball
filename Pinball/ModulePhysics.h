@@ -47,6 +47,30 @@ public:
 	PhysBody* CreateRectangleSensor(int x, int y, int width, int height);
 	PhysBody* CreateChain(int x, int y, int* points, int size);
 
+	PhysBody* CreateFlipper(int x, int y, int width, int height);
+	PhysBody* CreateStaticRectangle(int x, int y, int width, int height);
+	PhysBody* CreateStaticCircle(int x, int y, int radius);
+
+	PhysBody* leftFlipper;
+	PhysBody* leftJoint;
+
+	PhysBody* leftTopFlipper;
+	PhysBody* leftTopJoint;
+
+	PhysBody* rightFlipper;
+	PhysBody* rightJoint;
+
+	PhysBody* rightTopFlipper;
+	PhysBody* rightTopJoint;
+
+	b2Body* joint1;
+	b2Body* Flipper1;
+
+	b2RevoluteJointDef RevoluteJointLeft;
+	b2RevoluteJointDef RevoluteJointTopLeft;
+	b2RevoluteJointDef RevoluteJointRight;
+	b2RevoluteJointDef RevoluteJointTopRight;
+
 	// b2ContactListener ---
 	void BeginContact(b2Contact* contact);
 

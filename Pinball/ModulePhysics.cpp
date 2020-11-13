@@ -34,7 +34,60 @@ bool ModulePhysics::Start()
 	// needed to create joints like mouse joint
 	b2BodyDef bd;
 	ground = world->CreateBody(&bd);
+	
+	//----------FLIPPERS----------
 
+	//Flipper Bot Left
+	leftFlipper = CreateFlipper(160, 615, 60, 20);
+	leftJoint = CreateStaticRectangle(160, 615, 10, 10);
+
+	RevoluteJointLeft.bodyA = leftFlipper->body;
+	RevoluteJointLeft.bodyB = leftJoint->body;
+	RevoluteJointLeft.lowerAngle = -15 * DEGTORAD;
+	RevoluteJointLeft.upperAngle = 30 * DEGTORAD;
+	RevoluteJointLeft.enableLimit = true;
+	RevoluteJointLeft.localAnchorA.Set(PIXEL_TO_METERS(-22), 0);
+	RevoluteJointLeft.localAnchorB.Set(0, 0);	
+	b2RevoluteJoint* JointLeft = (b2RevoluteJoint*)world->CreateJoint(&RevoluteJointLeft);
+
+	//Flipper Top Left
+	leftTopFlipper = CreateFlipper(160, 295, 60, 20);
+	leftTopJoint = CreateStaticRectangle(160, 295, 10, 10);
+
+	RevoluteJointTopLeft.bodyA = leftTopFlipper->body;
+	RevoluteJointTopLeft.bodyB = leftTopJoint->body;
+	RevoluteJointTopLeft.lowerAngle = -15 * DEGTORAD;
+	RevoluteJointTopLeft.upperAngle = 30 * DEGTORAD;
+	RevoluteJointTopLeft.enableLimit = true;
+	RevoluteJointTopLeft.localAnchorA.Set(PIXEL_TO_METERS(-22), 0);
+	RevoluteJointTopLeft.localAnchorB.Set(0, 0);
+	b2RevoluteJoint* JointTopLeft = (b2RevoluteJoint*)world->CreateJoint(&RevoluteJointTopLeft);
+
+	//Flipper Bot Right
+	rightFlipper = CreateFlipper(297, 617, 60, 20);
+	rightJoint = CreateStaticRectangle(286, 617, 10, 10);
+
+	RevoluteJointRight.bodyA = rightFlipper->body;
+	RevoluteJointRight.bodyB = rightJoint->body;
+	RevoluteJointRight.lowerAngle = -30 * DEGTORAD;
+	RevoluteJointRight.upperAngle = 15 * DEGTORAD;
+	RevoluteJointRight.enableLimit = true;
+	RevoluteJointRight.localAnchorA.Set(PIXEL_TO_METERS(22), 0);
+	RevoluteJointRight.localAnchorB.Set(0, 0);
+	b2RevoluteJoint* JointRight = (b2RevoluteJoint*)world->CreateJoint(&RevoluteJointRight);
+
+	//Flipper Top Right
+	rightTopFlipper = CreateFlipper(297, 295, 60, 20);
+	rightTopJoint = CreateStaticRectangle(286, 295, 10, 10);
+
+	RevoluteJointTopRight.bodyA = rightTopFlipper->body;
+	RevoluteJointTopRight.bodyB = rightTopJoint->body;
+	RevoluteJointTopRight.lowerAngle = -30 * DEGTORAD;
+	RevoluteJointTopRight.upperAngle = 15 * DEGTORAD;
+	RevoluteJointTopRight.enableLimit = true;
+	RevoluteJointTopRight.localAnchorA.Set(PIXEL_TO_METERS(22), 0);
+	RevoluteJointTopRight.localAnchorB.Set(0, 0);
+	b2RevoluteJoint* JointTopRight = (b2RevoluteJoint*)world->CreateJoint(&RevoluteJointTopRight);
 
 	return true;
 }
@@ -164,6 +217,81 @@ PhysBody* ModulePhysics::CreateChain(int x, int y, int* points, int size)
 	pbody->body = b;
 	b->SetUserData(pbody);
 	pbody->width = pbody->height = 0;
+
+	return pbody;
+}
+
+PhysBody* ModulePhysics::CreateFlipper(int x, int y, int width, int height)
+{
+	b2BodyDef body;
+	body.type = b2_dynamicBody;
+	body.position.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
+
+	Flipper1 = world->CreateBody(&body);
+	
+	b2PolygonShape box;
+	box.SetAsBox(PIXEL_TO_METERS(width) * 0.5f, PIXEL_TO_METERS(height) * 0.5f);
+
+	b2FixtureDef fixture;
+	fixture.shape = &box;
+	fixture.density = 1.0f;
+
+	Flipper1->CreateFixture(&fixture);
+
+	PhysBody* pbody = new PhysBody();
+	pbody->body = Flipper1;
+	Flipper1->SetUserData(pbody);
+	pbody->width = width * 0.5f;
+	pbody->height = height * 0.5f;
+
+	return pbody;
+}
+
+PhysBody* ModulePhysics::CreateStaticRectangle(int x, int y, int width, int height)
+{
+	b2BodyDef body;
+	body.type = b2_staticBody;
+	body.position.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
+
+	b2Body* b = world->CreateBody(&body);
+	b2PolygonShape box;
+	box.SetAsBox(PIXEL_TO_METERS(width) * 0.5f, PIXEL_TO_METERS(height) * 0.5f);
+
+	b2FixtureDef fixture;
+	fixture.shape = &box;
+	fixture.density = 1.0f;
+
+	b->CreateFixture(&fixture);
+
+	PhysBody* pbody = new PhysBody();
+	pbody->body = b;
+	b->SetUserData(pbody);
+	pbody->width = width * 0.5f;
+	pbody->height = height * 0.5f;
+
+	return pbody;
+}
+
+PhysBody* ModulePhysics::CreateStaticCircle(int x, int y, int radius)
+{
+	b2BodyDef body;
+	body.type = b2_staticBody;
+	body.position.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
+
+	joint1 = world->CreateBody(&body);
+
+	b2CircleShape shape;
+	shape.m_radius = PIXEL_TO_METERS(radius);
+	b2FixtureDef fixture;
+	fixture.shape = &shape;
+	fixture.density = 1.0f;
+
+	joint1->CreateFixture(&fixture);
+
+	PhysBody* pbody = new PhysBody();
+	pbody->body = joint1;
+	joint1->SetUserData(pbody);
+	pbody->width = pbody->height = radius;
 
 	return pbody;
 }
