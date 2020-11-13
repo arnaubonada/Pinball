@@ -51,6 +51,9 @@ public:
 	PhysBody* CreateStaticRectangle(int x, int y, int width, int height);
 	PhysBody* CreateStaticCircle(int x, int y, int radius);
 
+	PhysBody* Kicker;
+	PhysBody* KickerPivot;
+
 	PhysBody* leftFlipper;
 	PhysBody* leftJoint;
 
@@ -65,6 +68,8 @@ public:
 
 	b2Body* joint1;
 	b2Body* Flipper1;
+
+	b2PrismaticJointDef PrismaticJointKicker;
 
 	b2RevoluteJointDef RevoluteJointLeft;
 	b2RevoluteJointDef RevoluteJointTopLeft;

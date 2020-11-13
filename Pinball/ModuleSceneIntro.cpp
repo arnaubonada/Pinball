@@ -6,12 +6,18 @@
 #include "ModuleTextures.h"
 #include "ModuleAudio.h"
 #include "ModulePhysics.h"
+#include "ModuleFonts.h"
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	sBall = SDL_Rect{ 34,0,16,16 };
 	sBumper = SDL_Rect{ 74,158,56,56 };
 	sKicker = SDL_Rect{ 0,0,32,145 };
+	sLeftFlipper = SDL_Rect{ 0,238,60,20 };
+	sRightFlipper = SDL_Rect{ 70,238,60,20 };
+	sHeart = SDL_Rect{ 274,277,24,24 };
+	sBarrier = SDL_Rect{ 41,0,18,38 };
+	sBluePoint = SDL_Rect{ 68,48,16,16 };
 	circle = box = rick = NULL;
 	ray_on = false;
 	sensed = false;
@@ -34,11 +40,11 @@ bool ModuleSceneIntro::Start()
 	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");*/
 
 	background = App->textures->Load("pinball/Background.png");
-	spritesheet = App->textures->Load("pinball/Spritesheet2.png");
-	spriteball = App->textures->Load("pinball/Spritesheet.png");
-
+	spritesheet = App->textures->Load("pinball/Spritesheet.png");
+	spriteball = App->textures->Load("pinball/Spriteball.png");
+	scoreFont = App->fonts->Load("pinball/font.png", "0123456789", 1);
 	//sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
-	ball = App->physics->CreateCircle(200, 474, 8);
+	ball = App->physics->CreateCircle(464, 400, 8);
 
 	hearts = 3;
 
@@ -170,25 +176,52 @@ update_status ModuleSceneIntro::Update()
 	sceneElements.clear();
 
 	App->renderer->Blit(background, 0, 0);
-
-	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
+	if (!nohearts)
 	{
-		App->physics->leftFlipper->body->ApplyForceToCenter({0, -100 }, true);
-		App->physics->RevoluteJointLeft.lowerAngle = -15 * DEGTORAD;
+		if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)
+		{
+			framesToSec++;
 
-		App->physics->leftTopFlipper->body->ApplyForceToCenter({ 0, -100 }, true);
-		App->physics->RevoluteJointTopLeft.lowerAngle = -15 * DEGTORAD;
-		
+			if (framesToSec == 1 || framesToSec == 30 || framesToSec == 60 || framesToSec == 90 || framesToSec == 120) {
+
+				strength += 50;
+
+				if (strength > 250) { strength = 250; }
+
+			}
+
+		}
+		if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_UP)
+		{
+
+			App->physics->Kicker->body->ApplyForceToCenter(b2Vec2(0, -strength), true);
+			framesToSec = 0;
+			strength = 0;
+
+		}
+		if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
+		{
+			App->physics->leftFlipper->body->ApplyForceToCenter({ 0, -100 }, true);
+			App->physics->RevoluteJointLeft.lowerAngle = -15 * DEGTORAD;
+
+			App->physics->leftTopFlipper->body->ApplyForceToCenter({ 0, -100 }, true);
+			App->physics->RevoluteJointTopLeft.lowerAngle = -15 * DEGTORAD;
+
+		}
+		if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
+		{
+			App->physics->rightFlipper->body->ApplyForceToCenter({ 0, -100 }, true);
+			App->physics->RevoluteJointLeft.lowerAngle = -15 * DEGTORAD;
+
+			App->physics->rightTopFlipper->body->ApplyForceToCenter({ 0, -100 }, true);
+			App->physics->RevoluteJointTopLeft.lowerAngle = -15 * DEGTORAD;
+
+		}
 	}
-	if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
-	{
-		App->physics->rightFlipper->body->ApplyForceToCenter({ 0, -100 }, true);
-		App->physics->RevoluteJointLeft.lowerAngle = -15 * DEGTORAD;
+	//Print Score
+	sprintf_s(scoreText, 10, "%1d", score);
 
-		App->physics->rightTopFlipper->body->ApplyForceToCenter({ 0, -100 }, true);
-		App->physics->RevoluteJointTopLeft.lowerAngle = -15 * DEGTORAD;
-
-	}
+	App->fonts->BlitText(-15, 5, scoreFont, scoreText);
 
 	int Background[102] = {
 		480, 477,
@@ -289,7 +322,7 @@ update_status ModuleSceneIntro::Update()
 		114, 265,
 		132, 273,
 		151, 280,
-		157, 285,
+		153, 285,
 		144, 291,
 		141, 297,
 		147, 307,
@@ -374,19 +407,50 @@ update_status ModuleSceneIntro::Update()
 	sceneElements.add(App->physics->CreateChain(0, 0, Background7, 12));
 	sceneElements.add(App->physics->CreateChain(0, 0, Background8, 12));
 
+	//print blue points
+	App->renderer->Blit(spritesheet, 192, 368, &sBluePoint);
+	App->renderer->Blit(spritesheet, 240, 368, &sBluePoint);
+
 	//print ball
 	App->renderer->Blit(spriteball, ball->body->GetPosition().x * 50 - 8, ball->body->GetPosition().y * 50 - 8, &sBall);
 
 	//print blumpers
-	App->renderer->Blit(spritesheet, 232 - 28, 88 - 28, &sBumper);
-	App->renderer->Blit(spritesheet, 168 - 28, 167 - 28, &sBumper);
-	App->renderer->Blit(spritesheet, 296 - 28, 167 - 28, &sBumper);
+	App->renderer->Blit(spritesheet, 204, 60, &sBumper);
+	App->renderer->Blit(spritesheet, 140, 139, &sBumper);
+	App->renderer->Blit(spritesheet, 268, 139, &sBumper);
+
+	//print barrier
+	App->renderer->Blit(spritesheet, 396, 10, &sBarrier);
+
+	//print right flippers
+	App->renderer->Blit(spritesheet, 238, 605, &sRightFlipper, 1.0f, App->physics->rightFlipper->GetRotation(), 50, 5);
+	App->renderer->Blit(spritesheet, 238, 285, &sRightFlipper, 1.0f, App->physics->rightTopFlipper->GetRotation(), 50, 5);
+	
+	//print left flippers
+	App->renderer->Blit(spritesheet, 150, 605, &sLeftFlipper, 1.0f, App->physics->leftFlipper->GetRotation(), 5, 5);
+	App->renderer->Blit(spritesheet, 150, 285, &sLeftFlipper, 1.0f, App->physics->leftTopFlipper->GetRotation(), 5, 5);
+
+	//print kicker
+
+	//print hearts
+	if (hearts == 3) 
+	{
+		App->renderer->Blit(spritesheet, 390, 615, &sHeart);
+		App->renderer->Blit(spritesheet, 420, 615, &sHeart);
+		App->renderer->Blit(spritesheet, 450, 615, &sHeart);
+	}	
+	if (hearts == 2) 
+	{
+		App->renderer->Blit(spritesheet, 420, 615, &sHeart);
+		App->renderer->Blit(spritesheet, 450, 615, &sHeart);
+	}	
+	if (hearts == 1) App->renderer->Blit(spritesheet, 450, 615, &sHeart);
 
 	//lose ball
 	if (ball->body->GetPosition().y * 50 > 645)
 	{
 		ball->body->GetWorld()->DestroyBody(ball->body);
-		ball = App->physics->CreateCircle(200, 50, 8);//x=465 y=474
+		ball = App->physics->CreateCircle(464, 400, 8);
 		hearts--;
 	}
 
@@ -445,6 +509,12 @@ update_status ModuleSceneIntro::Update()
 			App->renderer->DrawLine(ray.x + destination.x, ray.y + destination.y, ray.x + destination.x + normal.x * 25.0f, ray.y + destination.y + normal.y * 25.0f, 100, 255, 100);
 	}
 
+	return UPDATE_CONTINUE;
+}
+
+update_status ModuleSceneIntro::PostUpdate()
+{
+	
 	return UPDATE_CONTINUE;
 }
 

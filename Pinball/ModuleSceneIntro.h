@@ -16,10 +16,21 @@ public:
 
 	bool Start();
 	update_status Update();
+	update_status PostUpdate();
 	bool CleanUp();
 	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
 public:
+	int strength = 0;
+	int framesToSec = 0;
+
+	int scoreFont = 0;
+	int score = 0;
+	char scoreText[10];
+
+	int hearts;
+	bool nohearts = false;
+
 	p2List<PhysBody*> circles;
 	p2List<PhysBody*> boxes;
 	p2List<PhysBody*> sceneElements;
@@ -46,6 +57,9 @@ public:
 	SDL_Rect sBall;
 	SDL_Rect sBumper;
 	SDL_Rect sKicker;
-	int hearts;
-	bool nohearts = false;
+	SDL_Rect sLeftFlipper;
+	SDL_Rect sRightFlipper;
+	SDL_Rect sHeart;
+	SDL_Rect sBarrier;
+	SDL_Rect sBluePoint;
 };

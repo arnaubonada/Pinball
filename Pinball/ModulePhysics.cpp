@@ -35,6 +35,20 @@ bool ModulePhysics::Start()
 	b2BodyDef bd;
 	ground = world->CreateBody(&bd);
 	
+
+	//----------KICKER----------
+	Kicker = CreateRectangle(463, 420, 32, 5);
+	KickerPivot = CreateStaticRectangle(463, 462, 32, 5);
+
+	PrismaticJointKicker.bodyA = KickerPivot->body;
+	PrismaticJointKicker.bodyB = Kicker->body;
+	PrismaticJointKicker.enableLimit = true;
+	PrismaticJointKicker.collideConnected = false;
+	PrismaticJointKicker.lowerTranslation = PIXEL_TO_METERS(30);
+	PrismaticJointKicker.upperTranslation = PIXEL_TO_METERS(60);
+	PrismaticJointKicker.localAxisA.Set(0, -1);
+	b2PrismaticJoint* JointKicker = (b2PrismaticJoint*)world->CreateJoint(&PrismaticJointKicker);
+
 	//----------FLIPPERS----------
 
 	//Flipper Bot Left
