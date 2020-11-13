@@ -22,7 +22,7 @@ public:
 public:
 	p2List<PhysBody*> circles;
 	p2List<PhysBody*> boxes;
-	p2List<PhysBody*> ricks;
+	p2List<PhysBody*> sceneElements;
 	PhysBody* ball;
 	PhysBody* sensor;
 	bool sensed;
@@ -45,4 +45,7 @@ public:
 
 	SDL_Rect sBall;
 	SDL_Rect sBumper;
+	SDL_Rect sKicker;
+	int hearts;
+	bool nohearts = false;
 };

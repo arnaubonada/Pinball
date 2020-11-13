@@ -11,6 +11,7 @@ ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Modul
 {
 	sBall = SDL_Rect{ 34,0,16,16 };
 	sBumper = SDL_Rect{ 74,158,56,56 };
+	sKicker = SDL_Rect{ 0,0,32,145 };
 	circle = box = rick = NULL;
 	ray_on = false;
 	sensed = false;
@@ -37,9 +38,9 @@ bool ModuleSceneIntro::Start()
 	spriteball = App->textures->Load("pinball/Spritesheet.png");
 
 	//sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
-	ball = App->physics->CreateCircle(95, 380, 8);
+	ball = App->physics->CreateCircle(200, 474, 8);
 
-
+	hearts = 3;
 
 	//----------------------BUMPERS---------------------
 
@@ -160,13 +161,13 @@ bool ModuleSceneIntro::CleanUp()
 // Update: draw background
 update_status ModuleSceneIntro::Update()
 {
-	p2List_item<PhysBody*>* chain = ricks.getFirst();
+	p2List_item<PhysBody*>* chain = sceneElements.getFirst();
 	while (chain != nullptr) {
 		b2Body* body = chain->data->body;
 		chain->data->body->GetWorld()->DestroyBody(body);
 		chain = chain->next;
 	}
-	ricks.clear();
+	sceneElements.clear();
 
 	App->renderer->Blit(background, 0, 0);
 
@@ -363,15 +364,15 @@ update_status ModuleSceneIntro::Update()
 		272, 349,
 	};
 
-	ricks.add(App->physics->CreateChain(0, 0, Background, 102));
-	ricks.add(App->physics->CreateChain(0, 0, Background1, 26));
-	ricks.add(App->physics->CreateChain(0, 0, Background2, 38));
-	ricks.add(App->physics->CreateChain(0, 0, Background3, 64));
-	ricks.add(App->physics->CreateChain(0, 0, Background4, 16));
-	ricks.add(App->physics->CreateChain(0, 0, Background5, 16));
-	ricks.add(App->physics->CreateChain(0, 0, Background6, 12));
-	ricks.add(App->physics->CreateChain(0, 0, Background7, 12));
-	ricks.add(App->physics->CreateChain(0, 0, Background8, 12));
+	sceneElements.add(App->physics->CreateChain(0, 0, Background, 102));
+	sceneElements.add(App->physics->CreateChain(0, 0, Background1, 26));
+	sceneElements.add(App->physics->CreateChain(0, 0, Background2, 38));
+	sceneElements.add(App->physics->CreateChain(0, 0, Background3, 64));
+	sceneElements.add(App->physics->CreateChain(0, 0, Background4, 16));
+	sceneElements.add(App->physics->CreateChain(0, 0, Background5, 16));
+	sceneElements.add(App->physics->CreateChain(0, 0, Background6, 12));
+	sceneElements.add(App->physics->CreateChain(0, 0, Background7, 12));
+	sceneElements.add(App->physics->CreateChain(0, 0, Background8, 12));
 
 	//print ball
 	App->renderer->Blit(spriteball, ball->body->GetPosition().x * 50 - 8, ball->body->GetPosition().y * 50 - 8, &sBall);
@@ -381,7 +382,18 @@ update_status ModuleSceneIntro::Update()
 	App->renderer->Blit(spritesheet, 168 - 28, 167 - 28, &sBumper);
 	App->renderer->Blit(spritesheet, 296 - 28, 167 - 28, &sBumper);
 
+	//lose ball
+	if (ball->body->GetPosition().y * 50 > 645)
+	{
+		ball->body->GetWorld()->DestroyBody(ball->body);
+		ball = App->physics->CreateCircle(200, 50, 8);//x=465 y=474
+		hearts--;
+	}
 
+	if (hearts==0)
+	{
+		nohearts = true;
+	}
 	// Prepare for raycast ------------------------------------------------------
 	
 	iPoint mouse;
