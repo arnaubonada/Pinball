@@ -45,6 +45,7 @@ bool ModuleSceneIntro::Start()
 	spritesheet = App->textures->Load("pinball/Spritesheet.png");
 	spriteball = App->textures->Load("pinball/Spriteball.png");
 	scoreFont = App->fonts->Load("pinball/font.png", "0123456789", 1);
+	playAgain = App->textures->Load("pinball/playAgain.png");
 	//sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
 	ball = App->physics->CreateCircle(464, 400, 8);
 
@@ -252,6 +253,23 @@ update_status ModuleSceneIntro::Update()
 
 			App->physics->rightTopFlipper->body->ApplyForceToCenter({ 0, -100 }, true);
 			App->physics->RevoluteJointTopLeft.lowerAngle = -15 * DEGTORAD;
+
+		}
+		if (App->input->GetKey(SDL_SCANCODE_X) == KEY_REPEAT)
+		{
+
+			ball->body->GetWorld()->DestroyBody(ball->body);
+			ball = App->physics->CreateCircle(464, 400, 8);
+
+		}
+
+	}
+	if (nohearts) {
+		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT)
+		{
+
+			hearts = 3;
+			nohearts = false;
 
 		}
 	}
@@ -543,6 +561,7 @@ update_status ModuleSceneIntro::Update()
 
 	if (hearts==0)
 	{
+		App->renderer->Blit(playAgain, 40, 140);
 		nohearts = true;
 	}
 	// Prepare for raycast ------------------------------------------------------

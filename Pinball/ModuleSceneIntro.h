@@ -48,6 +48,7 @@ public:
 	b2Body* slingshot_2;
 
 	SDL_Texture* background;
+	SDL_Texture* playAgain;
 	SDL_Texture* spritesheet;
 	SDL_Texture* spriteball;
 	SDL_Texture* circle;
