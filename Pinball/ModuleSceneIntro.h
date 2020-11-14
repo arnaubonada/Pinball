@@ -35,9 +35,9 @@ public:
 	p2List<PhysBody*> boxes;
 	p2List<PhysBody*> sceneElements;
 	PhysBody* ball;
-	PhysBody* sensorBarrier;
+	PhysBody* sensorBluePoint1;
+	PhysBody* sensorBluePoint2;
 	bool sensed;
-	bool sensedBarrier;
 
 	b2Body* bumper_1;
 	b2Body* bumper_2;

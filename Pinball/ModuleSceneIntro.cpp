@@ -22,7 +22,6 @@ ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Modul
 	circle = box = rick = NULL;
 	ray_on = false;
 	sensed = false;
-	sensedBarrier = false;
 }
 
 ModuleSceneIntro::~ModuleSceneIntro()
@@ -51,80 +50,76 @@ bool ModuleSceneIntro::Start()
 
 	hearts = 3;
 
+	sensorBluePoint1 = App->physics->CreateRectangleSensor(202, 378, 5, 5);
+	sensorBluePoint1->listener = this;
+	sensorBluePoint2 = App->physics->CreateRectangleSensor(250, 378, 5, 5);
+	sensorBluePoint2->listener = this;
+
 	//----------------------BUMPERS---------------------
-
-
-
 	//Bumper 1
 	b2BodyDef bumper1;
-	bumper1.type = b2_staticBody; //this will be a dynamic body
-	bumper1.position.Set(PIXEL_TO_METERS(232), PIXEL_TO_METERS(88)); //a little to the left
-
+	bumper1.type = b2_staticBody;
+	bumper1.position.Set(PIXEL_TO_METERS(232), PIXEL_TO_METERS(88));
 	bumper_1 = App->physics->world->CreateBody(&bumper1);
+
 	b2CircleShape shape_bumper1;
-	shape_bumper1.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //position, relative to body position
-	shape_bumper1.m_radius = PIXEL_TO_METERS(28); //radius
+	shape_bumper1.m_radius = PIXEL_TO_METERS(28);
+
 	b2FixtureDef f_bumper1;
-	f_bumper1.shape = &shape_bumper1; //this is a pointer to the shape above
+	f_bumper1.shape = &shape_bumper1;
 	f_bumper1.restitution = 1, 1;
-	bumper_1->CreateFixture(&f_bumper1); //add a fixture to the body
+	bumper_1->CreateFixture(&f_bumper1);
 
 	//Bumper 2
 	b2BodyDef bumper2;
-	bumper2.type = b2_staticBody; //this will be a dynamic body
-	bumper2.position.Set(PIXEL_TO_METERS(168), PIXEL_TO_METERS(167)); //a little to the left
-
+	bumper2.type = b2_staticBody;
+	bumper2.position.Set(PIXEL_TO_METERS(168), PIXEL_TO_METERS(167));
 	bumper_2 = App->physics->world->CreateBody(&bumper2);
+
 	b2CircleShape shape_bumper2;
-	shape_bumper2.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //position, relative to body position
-	shape_bumper2.m_radius = PIXEL_TO_METERS(28); //radius
+	shape_bumper2.m_radius = PIXEL_TO_METERS(28);
+
 	b2FixtureDef f_bumper2;
-	f_bumper2.shape = &shape_bumper2; //this is a pointer to the shape above
+	f_bumper2.shape = &shape_bumper2;
 	f_bumper2.restitution = 1, 1;
-	bumper_2->CreateFixture(&f_bumper2); //add a fixture to the body
+	bumper_2->CreateFixture(&f_bumper2);
 
 	//Bumper 3
 	b2BodyDef bumper3;
-	bumper3.type = b2_staticBody; //this will be a dynamic body
-	bumper3.position.Set(PIXEL_TO_METERS(296), PIXEL_TO_METERS(167)); //a little to the left
-
+	bumper3.type = b2_staticBody;
+	bumper3.position.Set(PIXEL_TO_METERS(296), PIXEL_TO_METERS(167));
 	bumper_3 = App->physics->world->CreateBody(&bumper3);
 
 	b2CircleShape shape_bumper3;
-	shape_bumper3.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //position, relative to body position
-	shape_bumper3.m_radius = PIXEL_TO_METERS(28); //radius
+	shape_bumper3.m_radius = PIXEL_TO_METERS(28);
 
 	b2FixtureDef f_bumper3;
 	f_bumper3.shape = &shape_bumper3;
-	f_bumper3.restitution = 1, 1;//this is a pointer to the shape above
-	bumper_3->CreateFixture(&f_bumper3); //add a fixture to the body
-										 
+	f_bumper3.restitution = 1, 1;
+	bumper_3->CreateFixture(&f_bumper3);
+
 	//Bumper 4 (right heart)
 	b2BodyDef bumper4;
-	bumper4.type = b2_staticBody; 
-	bumper4.position.Set(PIXEL_TO_METERS(392), PIXEL_TO_METERS(560)); 
-
+	bumper4.type = b2_staticBody;
+	bumper4.position.Set(PIXEL_TO_METERS(392), PIXEL_TO_METERS(560));
 	bumper_4 = App->physics->world->CreateBody(&bumper4);
 
 	b2CircleShape shape_bumper4;
-	shape_bumper4.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); 
-	shape_bumper4.m_radius = PIXEL_TO_METERS(15); //radius
+	shape_bumper4.m_radius = PIXEL_TO_METERS(15);
 
 	b2FixtureDef f_bumper4;
 	f_bumper4.shape = &shape_bumper4;
 	f_bumper4.restitution = 3;
 	bumper_4->CreateFixture(&f_bumper4);
-	
+
 	//Bumper 5 (left heart)
 	b2BodyDef bumper5;
 	bumper5.type = b2_staticBody;
 	bumper5.position.Set(PIXEL_TO_METERS(56), PIXEL_TO_METERS(560));
-
 	bumper_5 = App->physics->world->CreateBody(&bumper5);
 
 	b2CircleShape shape_bumper5;
-	shape_bumper5.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); 
-	shape_bumper5.m_radius = PIXEL_TO_METERS(15); //radius
+	shape_bumper5.m_radius = PIXEL_TO_METERS(15);
 
 	b2FixtureDef f_bumper5;
 	f_bumper5.shape = &shape_bumper5;
@@ -255,27 +250,24 @@ update_status ModuleSceneIntro::Update()
 			App->physics->RevoluteJointTopLeft.lowerAngle = -15 * DEGTORAD;
 
 		}
-		if (App->input->GetKey(SDL_SCANCODE_X) == KEY_REPEAT)
+		if (App->input->GetKey(SDL_SCANCODE_R) == KEY_REPEAT)
 		{
-
 			ball->body->GetWorld()->DestroyBody(ball->body);
 			ball = App->physics->CreateCircle(464, 400, 8);
-
 		}
 
 	}
 	if (nohearts) {
 		if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT)
 		{
-
 			hearts = 3;
 			nohearts = false;
-
+			score = 0;
 		}
 	}
+
 	//Print Score
 	sprintf_s(scoreText, 10, "%1d", score);
-
 	App->fonts->BlitText(-15, 5, scoreFont, scoreText);
 
 	int Background[102] = {
@@ -373,7 +365,7 @@ update_status ModuleSceneIntro::Update()
 		402, 48,
 		414, 49,
 		422, 53,
-		430, 59,
+		430, 53,
 		430, 6,
 		121, 6
 	};
@@ -626,13 +618,8 @@ update_status ModuleSceneIntro::PostUpdate()
 
 void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
-	if (bodyA == ball)
+	if (bodyA == sensorBluePoint1 || bodyA == sensorBluePoint2)
 	{
-		if (bodyB == sensorBarrier)
-		{
-			sensedBarrier = true;
-		}
-
+		score += 20;
 	}
-	
 }
