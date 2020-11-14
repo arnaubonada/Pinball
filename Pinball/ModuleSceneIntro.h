@@ -35,12 +35,15 @@ public:
 	p2List<PhysBody*> boxes;
 	p2List<PhysBody*> sceneElements;
 	PhysBody* ball;
-	PhysBody* sensor;
+	PhysBody* sensorBarrier;
 	bool sensed;
+	bool sensedBarrier;
 
 	b2Body* bumper_1;
 	b2Body* bumper_2;
 	b2Body* bumper_3;
+	b2Body* bumper_4;
+	b2Body* bumper_5;
 	b2Body* slingshot_1;
 	b2Body* slingshot_2;
 
@@ -56,6 +59,7 @@ public:
 
 	SDL_Rect sBall;
 	SDL_Rect sBumper;
+	SDL_Rect sBumperHeart;
 	SDL_Rect sKicker;
 	SDL_Rect sLeftFlipper;
 	SDL_Rect sRightFlipper;

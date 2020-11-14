@@ -12,15 +12,17 @@ ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Modul
 {
 	sBall = SDL_Rect{ 34,0,16,16 };
 	sBumper = SDL_Rect{ 74,158,56,56 };
+	sBumperHeart = SDL_Rect{ 42,75,30,30 };
 	sKicker = SDL_Rect{ 0,0,32,145 };
 	sLeftFlipper = SDL_Rect{ 0,238,60,20 };
 	sRightFlipper = SDL_Rect{ 70,238,60,20 };
 	sHeart = SDL_Rect{ 274,277,24,24 };
-	sBarrier = SDL_Rect{ 41,0,18,38 };
+	sBarrier = SDL_Rect{ 41,0,18,46 };
 	sBluePoint = SDL_Rect{ 68,48,16,16 };
 	circle = box = rick = NULL;
 	ray_on = false;
 	sensed = false;
+	sensedBarrier = false;
 }
 
 ModuleSceneIntro::~ModuleSceneIntro()
@@ -95,6 +97,38 @@ bool ModuleSceneIntro::Start()
 	f_bumper3.shape = &shape_bumper3;
 	f_bumper3.restitution = 1, 1;//this is a pointer to the shape above
 	bumper_3->CreateFixture(&f_bumper3); //add a fixture to the body
+										 
+	//Bumper 4 (right heart)
+	b2BodyDef bumper4;
+	bumper4.type = b2_staticBody; 
+	bumper4.position.Set(PIXEL_TO_METERS(392), PIXEL_TO_METERS(560)); 
+
+	bumper_4 = App->physics->world->CreateBody(&bumper4);
+
+	b2CircleShape shape_bumper4;
+	shape_bumper4.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); 
+	shape_bumper4.m_radius = PIXEL_TO_METERS(15); //radius
+
+	b2FixtureDef f_bumper4;
+	f_bumper4.shape = &shape_bumper4;
+	f_bumper4.restitution = 3;
+	bumper_4->CreateFixture(&f_bumper4);
+	
+	//Bumper 5 (left heart)
+	b2BodyDef bumper5;
+	bumper5.type = b2_staticBody;
+	bumper5.position.Set(PIXEL_TO_METERS(56), PIXEL_TO_METERS(560));
+
+	bumper_5 = App->physics->world->CreateBody(&bumper5);
+
+	b2CircleShape shape_bumper5;
+	shape_bumper5.m_p.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); 
+	shape_bumper5.m_radius = PIXEL_TO_METERS(15); //radius
+
+	b2FixtureDef f_bumper5;
+	f_bumper5.shape = &shape_bumper5;
+	f_bumper5.restitution = 3;
+	bumper_5->CreateFixture(&f_bumper5);
 
 
 
@@ -151,6 +185,9 @@ bool ModuleSceneIntro::Start()
 	b2Body* dynamicBody2_2 = App->physics->world->CreateBody(&slingshot2);
 	fixture_slingshot2.restitution = 2;
 	dynamicBody2_2->CreateFixture(&fixture_slingshot2); //add a fixture to the body
+
+
+	//sensorBarrier = App->physics->CreateRectangleSensor(405, 30, 15, 35);
 
 
 	return ret;
@@ -224,14 +261,61 @@ update_status ModuleSceneIntro::Update()
 	App->fonts->BlitText(-15, 5, scoreFont, scoreText);
 
 	int Background[102] = {
-		480, 477,
-		478, 101,
-		477, 71,
-		464, 35,
-		450, 20,
-		428, 7,
-		114, 6,
-		93, 13,
+			480, 477,
+			478, 101,
+			477, 71,
+			464, 35,
+			450, 20,
+			428, 7,
+			114, 6,
+			93, 13,
+			79, 22,
+			65, 37,
+			55, 55,
+			47, 77,
+			40, 110,
+			35, 140,
+			34, 162,
+			31, 179,
+			25, 190,
+			19, 200,
+			19, 239,
+			19, 298,
+			22, 330,
+			30, 352,
+			52, 381,
+			53, 447,
+			35, 469,
+			35, 598,
+			90, 641,
+			90, 676,
+			361, 677,
+			361, 639,
+			411, 604,
+			412, 478,
+			397, 462,
+			397, 430,
+			412, 413,
+			425, 391,
+			428, 369,
+			427, 94,
+			424, 82,
+			414, 74,
+			400, 77,
+			362, 95,
+			353, 88,
+			390, 49,
+			413, 49,
+			430, 58,
+			439, 67,
+			447, 81,
+			449, 95,
+			447, 480,
+			480, 480
+	}; 
+	int BackgroundBarrier[88] = {
+		113, 5,
+		93, 10,
 		79, 22,
 		65, 37,
 		55, 55,
@@ -267,14 +351,13 @@ update_status ModuleSceneIntro::Update()
 		400, 77,
 		362, 95,
 		353, 88,
-		390, 49,
-		413, 49,
-		430, 58,
-		439, 67,
-		447, 81,
-		449, 95,
-		447, 480,
-		480, 480
+		392, 50,
+		402, 48,
+		414, 49,
+		422, 53,
+		430, 59,
+		430, 6,
+		121, 6
 	};
 	int Background1[26] = {
 		63, 113,
@@ -397,7 +480,8 @@ update_status ModuleSceneIntro::Update()
 		272, 349,
 	};
 
-	sceneElements.add(App->physics->CreateChain(0, 0, Background, 102));
+	if ((ball->body->GetPosition().x * 50) > 428) sceneElements.add(App->physics->CreateChain(0, 0, Background, 102));
+	else sceneElements.add(App->physics->CreateChain(0, 0, BackgroundBarrier, 88));
 	sceneElements.add(App->physics->CreateChain(0, 0, Background1, 26));
 	sceneElements.add(App->physics->CreateChain(0, 0, Background2, 38));
 	sceneElements.add(App->physics->CreateChain(0, 0, Background3, 64));
@@ -414,13 +498,15 @@ update_status ModuleSceneIntro::Update()
 	//print ball
 	App->renderer->Blit(spriteball, ball->body->GetPosition().x * 50 - 8, ball->body->GetPosition().y * 50 - 8, &sBall);
 
-	//print blumpers
+	//print bumpers
 	App->renderer->Blit(spritesheet, 204, 60, &sBumper);
 	App->renderer->Blit(spritesheet, 140, 139, &sBumper);
 	App->renderer->Blit(spritesheet, 268, 139, &sBumper);
+	App->renderer->Blit(spritesheet, 376, 545, &sBumperHeart);
+	App->renderer->Blit(spritesheet, 41, 545, &sBumperHeart);
 
 	//print barrier
-	App->renderer->Blit(spritesheet, 396, 10, &sBarrier);
+	App->renderer->Blit(spritesheet, 412, 8, &sBarrier);
 
 	//print right flippers
 	App->renderer->Blit(spritesheet, 238, 605, &sRightFlipper, 1.0f, App->physics->rightFlipper->GetRotation(), 50, 5);
@@ -431,6 +517,7 @@ update_status ModuleSceneIntro::Update()
 	App->renderer->Blit(spritesheet, 150, 285, &sLeftFlipper, 1.0f, App->physics->leftTopFlipper->GetRotation(), 5, 5);
 
 	//print kicker
+	App->renderer->Blit(spritesheet, App->physics->Kicker->body->GetPosition().x * 50-15, App->physics->Kicker->body->GetPosition().y *50 - 2, &sKicker);
 
 	//print hearts
 	if (hearts == 3) 
@@ -520,8 +607,13 @@ update_status ModuleSceneIntro::PostUpdate()
 
 void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
-	int x, y;
+	if (bodyA == ball)
+	{
+		if (bodyB == sensorBarrier)
+		{
+			sensedBarrier = true;
+		}
 
-	App->audio->PlayFx(bonus_fx);
+	}
 	
 }
