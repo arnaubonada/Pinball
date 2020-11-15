@@ -34,16 +34,17 @@ bool ModuleSceneIntro::Start()
 
 	App->renderer->camera.x = App->renderer->camera.y = 0;
 
-
 	background = App->textures->Load("pinball/Background.png");
 	spritesheet = App->textures->Load("pinball/Spritesheet.png");
 	spriteball = App->textures->Load("pinball/Spriteball.png");
 	scTexture = App->textures->Load("pinball/Score.png");
 	scoreFont = App->fonts->Load("pinball/font.png", "0123456789", 1);
 	playAgain = App->textures->Load("pinball/playAgain.png");
-
+	
+	flipper_fx = App->audio->LoadFx("pinball/Flipper.wav");
+	kicker_fx = App->audio->LoadFx("pinball/Kicker.wav");
 	ball = App->physics->CreateCircle(464, 400, 8);
-
+	App->audio->PlayMusic("pinball/soundtrack.ogg");
 	hearts = 3;
 
 	sensorBluePoint1 = App->physics->CreateRectangleSensor(200, 376, 5, 5);
@@ -122,65 +123,50 @@ bool ModuleSceneIntro::Start()
 	f_bumper5.restitution = 3;
 	bumper_5->CreateFixture(&f_bumper5);
 
-
-
 	//----------------------SLINGSHOTS---------------------
-
-
-
 	//Slingshot 1
 	b2BodyDef slingshot1;
-	slingshot1.type = b2_staticBody; //this will be a dynamic body
-	//slingshot1.position.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //a little to the left
-
+	slingshot1.type = b2_staticBody;
 	slingshot_1 = App->physics->world->CreateBody(&slingshot1);
 
 	b2Vec2 vertices1[5];
-	vertices1[0].Set(PIXEL_TO_METERS(62*2), PIXEL_TO_METERS(266*2));
-	vertices1[1].Set(PIXEL_TO_METERS(77*2), PIXEL_TO_METERS(274*2));
-	vertices1[2].Set(PIXEL_TO_METERS(80*2), PIXEL_TO_METERS(270*2));
-	vertices1[3].Set(PIXEL_TO_METERS(66*2), PIXEL_TO_METERS(247*2));
-	vertices1[4].Set(PIXEL_TO_METERS(62*2), PIXEL_TO_METERS(249*2));
+	vertices1[0].Set(PIXEL_TO_METERS(124), PIXEL_TO_METERS(532));
+	vertices1[1].Set(PIXEL_TO_METERS(154), PIXEL_TO_METERS(548));
+	vertices1[2].Set(PIXEL_TO_METERS(160), PIXEL_TO_METERS(540));
+	vertices1[3].Set(PIXEL_TO_METERS(132), PIXEL_TO_METERS(494));
+	vertices1[4].Set(PIXEL_TO_METERS(124), PIXEL_TO_METERS(498));
 
 	b2PolygonShape shape_slingshot1;
-	shape_slingshot1.Set(vertices1, 5); //pass array to the shape
+	shape_slingshot1.Set(vertices1, 5);
 
 	b2FixtureDef fixture_slingshot1;
-	fixture_slingshot1.shape = &shape_slingshot1; //change the shape of the fixture
-	//slingshot1.position.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //in the middle
+	fixture_slingshot1.shape = &shape_slingshot1;
 
 	b2Body* dynamicBody2_l = App->physics->world->CreateBody(&slingshot1);
 	fixture_slingshot1.restitution = 2;
-	dynamicBody2_l->CreateFixture(&fixture_slingshot1); //add a fixture to the body
+	dynamicBody2_l->CreateFixture(&fixture_slingshot1); 
 	
 	//Slingshot 2
 	b2BodyDef slingshot2;
-	slingshot2.type = b2_staticBody; //this will be a dynamic body
-	//slingshot2.position.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //a little to the left
-
+	slingshot2.type = b2_staticBody; 
 	slingshot_2 = App->physics->world->CreateBody(&slingshot2);
 
 	b2Vec2 vertices2[5];
-	vertices2[0].Set(PIXEL_TO_METERS(162*2), PIXEL_TO_METERS(266*2));
-	vertices2[1].Set(PIXEL_TO_METERS(147*2), PIXEL_TO_METERS(274*2));
-	vertices2[2].Set(PIXEL_TO_METERS(144*2), PIXEL_TO_METERS(270*2));
-	vertices2[3].Set(PIXEL_TO_METERS(157*2), PIXEL_TO_METERS(247*2));
-	vertices2[4].Set(PIXEL_TO_METERS(162*2), PIXEL_TO_METERS(249*2));
+	vertices2[0].Set(PIXEL_TO_METERS(324), PIXEL_TO_METERS(532));
+	vertices2[1].Set(PIXEL_TO_METERS(294), PIXEL_TO_METERS(548));
+	vertices2[2].Set(PIXEL_TO_METERS(288), PIXEL_TO_METERS(540));
+	vertices2[3].Set(PIXEL_TO_METERS(314), PIXEL_TO_METERS(494));
+	vertices2[4].Set(PIXEL_TO_METERS(324), PIXEL_TO_METERS(496));
 
 	b2PolygonShape shape_slingshot2;
-	shape_slingshot2.Set(vertices2, 5); //pass array to the shape
+	shape_slingshot2.Set(vertices2, 5);
 
 	b2FixtureDef fixture_slingshot2;
-	fixture_slingshot2.shape = &shape_slingshot2; //change the shape of the fixture
-	//slingshot1.position.Set(PIXEL_TO_METERS(0), PIXEL_TO_METERS(0)); //in the middle
+	fixture_slingshot2.shape = &shape_slingshot2;
 
 	b2Body* dynamicBody2_2 = App->physics->world->CreateBody(&slingshot2);
 	fixture_slingshot2.restitution = 2;
-	dynamicBody2_2->CreateFixture(&fixture_slingshot2); //add a fixture to the body
-
-
-	//sensorBarrier = App->physics->CreateRectangleSensor(405, 30, 15, 35);
-
+	dynamicBody2_2->CreateFixture(&fixture_slingshot2); 
 
 	return ret;
 }
@@ -227,10 +213,16 @@ update_status ModuleSceneIntro::Update()
 		}
 		if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_UP)
 		{
-
+			App->audio->PlayFx(kicker_fx);
 			App->physics->Kicker->body->ApplyForceToCenter(b2Vec2(0, -strength), true);
 			framesToSec = 0;
 			strength = 0;
+
+		}
+		if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_DOWN || App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_DOWN)
+		{
+
+			App->audio->PlayFx(flipper_fx);
 
 		}
 		if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
@@ -373,8 +365,8 @@ update_status ModuleSceneIntro::Update()
 		392, 50,
 		402, 48,
 		414, 49,
-		422, 53,
-		430, 53,
+		422, 48,
+		430, 48,
 		430, 6,
 		121, 6
 	};
@@ -515,7 +507,7 @@ update_status ModuleSceneIntro::Update()
 	App->renderer->Blit(spritesheet, 240, 368, &sBluePoint);
 
 	//print ball
-	App->renderer->Blit(spriteball, ball->body->GetPosition().x * 50 - 8, ball->body->GetPosition().y * 50 - 8, &sBall);
+	App->renderer->Blit(spriteball, METERS_TO_PIXELS(ball->body->GetPosition().x) - 8, METERS_TO_PIXELS(ball->body->GetPosition().y) - 8, &sBall);
 
 	//print bumpers
 	App->renderer->Blit(spritesheet, 204, 60, &sBumper);
@@ -536,7 +528,7 @@ update_status ModuleSceneIntro::Update()
 	App->renderer->Blit(spritesheet, 150, 285, &sLeftFlipper, 1.0f, App->physics->leftTopFlipper->GetRotation(), 5, 5);
 
 	//print kicker
-	App->renderer->Blit(spritesheet, App->physics->Kicker->body->GetPosition().x * 50-15, App->physics->Kicker->body->GetPosition().y *50 - 2, &sKicker);
+	App->renderer->Blit(spritesheet, METERS_TO_PIXELS(App->physics->Kicker->body->GetPosition().x) - 15, METERS_TO_PIXELS(App->physics->Kicker->body->GetPosition().y) - 2, &sKicker);
 
 	//print hearts
 	if (hearts == 3) 
@@ -553,7 +545,7 @@ update_status ModuleSceneIntro::Update()
 	if (hearts == 1) App->renderer->Blit(spritesheet, 450, 615, &sHeart);
 
 	//lose ball
-	if (ball->body->GetPosition().y * 50 > 645)
+	if (METERS_TO_PIXELS(ball->body->GetPosition().y) > 645)
 	{
 		ball->body->GetWorld()->DestroyBody(ball->body);
 		ball = App->physics->CreateCircle(464, 400, 8);

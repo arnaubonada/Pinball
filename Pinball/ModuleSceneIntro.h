@@ -56,7 +56,11 @@ public:
 	SDL_Texture* spritesheet;
 	SDL_Texture* spriteball;
 	SDL_Texture* scTexture;
+
 	uint bonus_fx;
+	uint flipper_fx;
+	uint kicker_fx;
+
 	p2Point<int> ray;
 	bool ray_on;
 
