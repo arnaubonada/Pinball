@@ -43,9 +43,13 @@ bool ModuleSceneIntro::Start()
 	
 	flipper_fx = App->audio->LoadFx("pinball/Flipper.wav");
 	kicker_fx = App->audio->LoadFx("pinball/Kicker.wav");
+	bumper_fx = App->audio->LoadFx("pinball/Bumper.wav");
+	bonus_fx = App->audio->LoadFx("pinball/Bonus.wav");
+
 	ball = App->physics->CreateCircle(464, 400, 8);
 	App->audio->PlayMusic("pinball/soundtrack.ogg");
 	hearts = 3;
+	bonusBumper = 0;
 
 	sensorBluePoint1 = App->physics->CreateRectangleSensor(200, 376, 5, 5);
 	sensorBluePoint1->listener = this;
@@ -268,6 +272,7 @@ update_status ModuleSceneIntro::Update()
 			if (score > highScore) highScore = score;
 			prevScore = score;
 			score = 0;
+			bonusBumper = 0;
 		}
 	}
 
@@ -380,7 +385,7 @@ update_status ModuleSceneIntro::Update()
 		146, 60,
 		148, 75,
 		143, 83,
-		76, 150,
+		74, 150,
 		63, 144,
 		60, 127,
 		62, 113
@@ -407,7 +412,7 @@ update_status ModuleSceneIntro::Update()
 		389, 140
 	};
 
-	int Background3[64] = {
+	int Background3[66] = {
 		76, 206,
 		82, 205,
 		90, 213,
@@ -424,6 +429,7 @@ update_status ModuleSceneIntro::Update()
 		159, 316,
 		146, 323,
 		111, 356,
+		108, 360,
 		101, 356,
 		76, 331,
 		73, 324,
@@ -439,7 +445,7 @@ update_status ModuleSceneIntro::Update()
 		66, 239,
 		66, 230,
 		73, 225,
-		73, 208
+		73, 212
 	};
 
 	int Background4[16] = {
@@ -465,19 +471,19 @@ update_status ModuleSceneIntro::Update()
 	};
 
 	int Background6[12] = {
-		176, 349,
+		176, 351,
 		183, 353,
 		183, 398,
-		176, 404,
+		176, 401,
 		168, 397,
 		168, 355,
 	};
 
 	int Background7[12] = {
-		224, 347,
+		224, 349,
 		231, 353,
 		231, 396,
-		224, 404,
+		224, 401,
 		216, 397,
 		216, 353,
 	};
@@ -485,17 +491,17 @@ update_status ModuleSceneIntro::Update()
 	int Background8[12] = {
 		264, 355,
 		264, 396,
-		272, 403,
+		272, 401,
 		279, 396,
 		280, 355,
-		272, 349,
+		272, 350,
 	};
 	
 	if (METERS_TO_PIXELS(ball->body->GetPosition().x) > 428) sceneElements.add(App->physics->CreateChain(0, 0, Background, 102));
 	else sceneElements.add(App->physics->CreateChain(0, 0, BackgroundBarrier, 88));
 	sceneElements.add(App->physics->CreateChain(0, 0, Background1, 26));
 	sceneElements.add(App->physics->CreateChain(0, 0, Background2, 38));
-	sceneElements.add(App->physics->CreateChain(0, 0, Background3, 64));
+	sceneElements.add(App->physics->CreateChain(0, 0, Background3, 66));
 	sceneElements.add(App->physics->CreateChain(0, 0, Background4, 16));
 	sceneElements.add(App->physics->CreateChain(0, 0, Background5, 16));
 	sceneElements.add(App->physics->CreateChain(0, 0, Background6, 12));
@@ -571,6 +577,19 @@ update_status ModuleSceneIntro::Update()
 	sprintf_s(prevScoreText, 10, "%1d", prevScore);
 	App->fonts->BlitText(325, 649, scoreFont, prevScoreText);
 
+	if (bumperSensed == true) {
+		bumperSensed = false;
+		App->audio->PlayFx(bumper_fx);
+		score += 100;
+		bonusBumper++;
+	}
+	if (bonusBumper == 20)
+	{
+		App->audio->PlayFx(bonus_fx);
+		score += 10000;
+		bonusBumper = 0;
+	}
+	if (score > 999999) score = 999999;
 
 	// Prepare for raycast ------------------------------------------------------
 	

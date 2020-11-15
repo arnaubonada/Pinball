@@ -41,7 +41,10 @@ public:
 	PhysBody* ball;
 	PhysBody* sensorBluePoint1;
 	PhysBody* sensorBluePoint2;
+
 	bool sensed;
+	bool bumperSensed = false;
+	int bonusBumper;
 
 	b2Body* bumper_1;
 	b2Body* bumper_2;
@@ -56,10 +59,11 @@ public:
 	SDL_Texture* spritesheet;
 	SDL_Texture* spriteball;
 	SDL_Texture* scTexture;
-
-	uint bonus_fx;
+	
 	uint flipper_fx;
 	uint kicker_fx;
+	uint bumper_fx;
+	uint bonus_fx;
 
 	p2Point<int> ray;
 	bool ray_on;
