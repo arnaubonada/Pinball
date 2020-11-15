@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a Pinball Project by Xeics Games.
+This is a Pinball Project by Xeics Games, for the subject of Physics II in CITM UPC (Terrassa).
 
 Our pinball recreation is "Pinkie Pie Pinball", which is a minigame from the original game "My Little Pony Crystal Princess: Runaway Rainbow". 
 
