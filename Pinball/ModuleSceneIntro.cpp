@@ -19,7 +19,6 @@ ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Modul
 	sHeart = SDL_Rect{ 274,277,24,24 };
 	sBarrier = SDL_Rect{ 41,0,18,46 };
 	sBluePoint = SDL_Rect{ 68,48,16,16 };
-	circle = box = rick = NULL;
 	ray_on = false;
 	sensed = false;
 }
@@ -35,24 +34,21 @@ bool ModuleSceneIntro::Start()
 
 	App->renderer->camera.x = App->renderer->camera.y = 0;
 
-	/*circle = App->textures->Load("pinball/wheel.png"); 
-	box = App->textures->Load("pinball/crate.png");
-	rick = App->textures->Load("pinball/rick_head.png");
-	bonus_fx = App->audio->LoadFx("pinball/bonus.wav");*/
 
 	background = App->textures->Load("pinball/Background.png");
 	spritesheet = App->textures->Load("pinball/Spritesheet.png");
 	spriteball = App->textures->Load("pinball/Spriteball.png");
+	scTexture = App->textures->Load("pinball/Score.png");
 	scoreFont = App->fonts->Load("pinball/font.png", "0123456789", 1);
 	playAgain = App->textures->Load("pinball/playAgain.png");
-	//sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
+
 	ball = App->physics->CreateCircle(464, 400, 8);
 
 	hearts = 3;
 
-	sensorBluePoint1 = App->physics->CreateRectangleSensor(202, 378, 5, 5);
+	sensorBluePoint1 = App->physics->CreateRectangleSensor(200, 376, 5, 5);
 	sensorBluePoint1->listener = this;
-	sensorBluePoint2 = App->physics->CreateRectangleSensor(250, 378, 5, 5);
+	sensorBluePoint2 = App->physics->CreateRectangleSensor(248, 376, 5, 5);
 	sensorBluePoint2->listener = this;
 
 	//----------------------BUMPERS---------------------
@@ -193,7 +189,12 @@ bool ModuleSceneIntro::Start()
 bool ModuleSceneIntro::CleanUp()
 {
 	LOG("Unloading Intro scene");
-
+	App->textures->Unload(background);
+	App->textures->Unload(spritesheet);
+	App->textures->Unload(spriteball);
+	App->textures->Unload(scTexture);
+	App->textures->Unload(playAgain);
+	App->fonts->UnLoad(scoreFont);
 	return true;
 }
 
@@ -250,10 +251,20 @@ update_status ModuleSceneIntro::Update()
 			App->physics->RevoluteJointTopLeft.lowerAngle = -15 * DEGTORAD;
 
 		}
-		if (App->input->GetKey(SDL_SCANCODE_R) == KEY_REPEAT)
+
+		//input to restart a ball
+		if (App->input->GetKey(SDL_SCANCODE_R) == KEY_DOWN)
 		{
 			ball->body->GetWorld()->DestroyBody(ball->body);
 			ball = App->physics->CreateCircle(464, 400, 8);
+		}
+
+		//input to lose a heart
+		if (App->input->GetKey(SDL_SCANCODE_L) == KEY_DOWN)
+		{
+			ball->body->GetWorld()->DestroyBody(ball->body);
+			ball = App->physics->CreateCircle(464, 400, 8);
+			hearts=0;
 		}
 
 	}
@@ -262,13 +273,11 @@ update_status ModuleSceneIntro::Update()
 		{
 			hearts = 3;
 			nohearts = false;
+			if (score > highScore) highScore = score;
+			prevScore = score;
 			score = 0;
 		}
 	}
-
-	//Print Score
-	sprintf_s(scoreText, 10, "%1d", score);
-	App->fonts->BlitText(-15, 5, scoreFont, scoreText);
 
 	int Background[102] = {
 			480, 477,
@@ -489,8 +498,8 @@ update_status ModuleSceneIntro::Update()
 		280, 355,
 		272, 349,
 	};
-
-	if ((ball->body->GetPosition().x * 50) > 428) sceneElements.add(App->physics->CreateChain(0, 0, Background, 102));
+	
+	if (METERS_TO_PIXELS(ball->body->GetPosition().x) > 428) sceneElements.add(App->physics->CreateChain(0, 0, Background, 102));
 	else sceneElements.add(App->physics->CreateChain(0, 0, BackgroundBarrier, 88));
 	sceneElements.add(App->physics->CreateChain(0, 0, Background1, 26));
 	sceneElements.add(App->physics->CreateChain(0, 0, Background2, 38));
@@ -554,8 +563,23 @@ update_status ModuleSceneIntro::Update()
 	if (hearts==0)
 	{
 		App->renderer->Blit(playAgain, 40, 140);
+		App->fonts->BlitText(170, 265, scoreFont, scoreText);
 		nohearts = true;
 	}
+
+	//print score
+	App->renderer->Blit(scTexture, 0, 640);
+
+	sprintf_s(scoreText, 10, "%1d", score);
+	if (hearts != 0) App->fonts->BlitText(-15, 5, scoreFont, scoreText);
+	
+	sprintf_s(highScoreText, 10, "%1d", highScore);
+	App->fonts->BlitText(75, 649, scoreFont, highScoreText);
+	
+	sprintf_s(prevScoreText, 10, "%1d", prevScore);
+	App->fonts->BlitText(325, 649, scoreFont, prevScoreText);
+
+
 	// Prepare for raycast ------------------------------------------------------
 	
 	iPoint mouse;
@@ -564,35 +588,6 @@ update_status ModuleSceneIntro::Update()
 	int ray_hit = ray.DistanceTo(mouse);
 
 	fVector normal(0.0f, 0.0f);
-
-	// All draw functions ------------------------------------------------------
-	p2List_item<PhysBody*>* c = circles.getFirst();
-
-	while(c != NULL)
-	{
-		int x, y;
-		c->data->GetPosition(x, y);
-		if(c->data->Contains(App->input->GetMouseX(), App->input->GetMouseY()))
-			App->renderer->Blit(circle, x, y, NULL, 1.0f, c->data->GetRotation());
-		c = c->next;
-	}
-
-	c = boxes.getFirst();
-
-	while(c != NULL)
-	{
-		int x, y;
-		c->data->GetPosition(x, y);
-		App->renderer->Blit(box, x, y, NULL, 1.0f, c->data->GetRotation());
-		if(ray_on)
-		{
-			int hit = c->data->RayCast(ray.x, ray.y, mouse.x, mouse.y, normal.x, normal.y);
-			if(hit >= 0)
-				ray_hit = hit;
-		}
-		c = c->next;
-	}
-
 
 	//// ray -----------------
 	if(ray_on == true)
@@ -607,12 +602,6 @@ update_status ModuleSceneIntro::Update()
 			App->renderer->DrawLine(ray.x + destination.x, ray.y + destination.y, ray.x + destination.x + normal.x * 25.0f, ray.y + destination.y + normal.y * 25.0f, 100, 255, 100);
 	}
 
-	return UPDATE_CONTINUE;
-}
-
-update_status ModuleSceneIntro::PostUpdate()
-{
-	
 	return UPDATE_CONTINUE;
 }
 

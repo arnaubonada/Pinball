@@ -293,7 +293,7 @@ PhysBody* ModulePhysics::CreateStaticCircle(int x, int y, int radius)
 	body.type = b2_staticBody;
 	body.position.Set(PIXEL_TO_METERS(x), PIXEL_TO_METERS(y));
 
-	joint1 = world->CreateBody(&body);
+	Joint1 = world->CreateBody(&body);
 
 	b2CircleShape shape;
 	shape.m_radius = PIXEL_TO_METERS(radius);
@@ -301,11 +301,11 @@ PhysBody* ModulePhysics::CreateStaticCircle(int x, int y, int radius)
 	fixture.shape = &shape;
 	fixture.density = 1.0f;
 
-	joint1->CreateFixture(&fixture);
+	Joint1->CreateFixture(&fixture);
 
 	PhysBody* pbody = new PhysBody();
-	pbody->body = joint1;
-	joint1->SetUserData(pbody);
+	pbody->body = Joint1;
+	Joint1->SetUserData(pbody);
 	pbody->width = pbody->height = radius;
 
 	return pbody;
@@ -322,6 +322,8 @@ update_status ModulePhysics::PostUpdate()
 
 	// Bonus code: this will iterate all objects in the world and draw the circles
 	// You need to provide your own macro to translate meters to pixels
+
+	b2Vec2 mousePosition(PIXEL_TO_METERS(App->input->GetMouseX()), PIXEL_TO_METERS(App->input->GetMouseY()));
 	for(b2Body* b = world->GetBodyList(); b; b = b->GetNext())
 	{
 		for(b2Fixture* f = b->GetFixtureList(); f; f = f->GetNext())
@@ -389,10 +391,13 @@ update_status ModulePhysics::PostUpdate()
 				}
 				break;
 			}
-
 			// TODO 1: If mouse button 1 is pressed ...
 			// App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN
 			// test if the current body contains mouse position
+			if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_DOWN && bodyClicked == nullptr && f->GetShape()->TestPoint(b->GetTransform(), mousePosition))
+			{
+				bodyClicked = b;
+			}
 		}
 	}
 
@@ -400,12 +405,38 @@ update_status ModulePhysics::PostUpdate()
 	// so we can pull it around
 	// TODO 2: If a body was selected, create a mouse joint
 	// using mouse_joint class property
-
-
 	// TODO 3: If the player keeps pressing the mouse button, update
 	// target position and draw a red line between both anchor points
-
 	// TODO 4: If the player releases the mouse button, destroy the joint
+
+	if (bodyClicked != nullptr)
+	{
+		if (!jointCreated) {
+			b2MouseJointDef def;
+			def.bodyA = ground;
+			def.bodyB = bodyClicked;
+			def.target = mousePosition;
+			def.dampingRatio = 0.5f;
+			def.frequencyHz = 2.0f;
+			def.maxForce = 100.0f * bodyClicked->GetMass();
+			mouse_joint = (b2MouseJoint*)world->CreateJoint(&def);
+			jointCreated = true;
+		}
+		else
+		{
+			mouse_joint->SetTarget(mousePosition);
+			App->renderer->DrawLine(METERS_TO_PIXELS(mouse_joint->GetBodyB()->GetPosition().x), METERS_TO_PIXELS(mouse_joint->GetBodyB()->GetPosition().y), App->input->GetMouseX(), App->input->GetMouseY(), 0, 0, 255);
+		}
+
+		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_UP)
+		{
+			world->DestroyJoint(mouse_joint);
+			mouse_joint = nullptr;
+			bodyClicked = nullptr;
+			jointCreated = false;
+		}
+
+	}
 
 	return UPDATE_CONTINUE;
 }

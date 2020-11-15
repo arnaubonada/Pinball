@@ -66,7 +66,7 @@ public:
 	PhysBody* rightTopFlipper;
 	PhysBody* rightTopJoint;
 
-	b2Body* joint1;
+	b2Body* Joint1;
 	b2Body* Flipper1;
 
 	b2PrismaticJointDef PrismaticJointKicker;
@@ -83,7 +83,9 @@ public:
 private:
 
 	bool debug;
-	
-	b2MouseJoint* mouse_joint;
 	b2Body* ground;
+
+	b2MouseJoint* mouse_joint;
+	b2Body* bodyClicked = nullptr;
+	bool jointCreated = false;
 };

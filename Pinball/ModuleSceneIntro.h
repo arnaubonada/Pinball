@@ -16,7 +16,6 @@ public:
 
 	bool Start();
 	update_status Update();
-	update_status PostUpdate();
 	bool CleanUp();
 	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
@@ -25,8 +24,13 @@ public:
 	int framesToSec = 0;
 
 	int scoreFont = 0;
+
 	int score = 0;
 	char scoreText[10];
+	int highScore = 0;
+	char highScoreText[10];
+	int prevScore = 0;
+	char prevScoreText[10];
 
 	int hearts;
 	bool nohearts = false;
@@ -51,9 +55,7 @@ public:
 	SDL_Texture* playAgain;
 	SDL_Texture* spritesheet;
 	SDL_Texture* spriteball;
-	SDL_Texture* circle;
-	SDL_Texture* box;
-	SDL_Texture* rick;
+	SDL_Texture* scTexture;
 	uint bonus_fx;
 	p2Point<int> ray;
 	bool ray_on;
