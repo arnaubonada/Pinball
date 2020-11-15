@@ -46,13 +46,35 @@ public:
 	bool bumperSensed = false;
 	int bonusBumper;
 
-	b2Body* bumper_1;
-	b2Body* bumper_2;
-	b2Body* bumper_3;
-	b2Body* bumper_4;
-	b2Body* bumper_5;
-	b2Body* slingshot_1;
-	b2Body* slingshot_2;
+	b2BodyDef bumper1;
+	b2BodyDef bumper2;
+	b2BodyDef bumper3;
+	b2BodyDef RightHeartBumper;
+	b2BodyDef LeftHeartBumper;
+
+	b2FixtureDef bumperFixture1;
+	b2FixtureDef bumperFixture2;
+	b2FixtureDef bumperFixture3;
+	b2FixtureDef rightBumperFix;
+	b2FixtureDef leftBumperFix;
+
+	b2BodyDef slingshot1;
+	b2BodyDef slingshot2;
+	b2BodyDef slingshot3;
+
+	b2FixtureDef leftSlingshotFix;
+	b2FixtureDef rightSlingshotFix;
+
+	b2Body* Bumper1;
+	b2Body* Bumper2;
+	b2Body* Bumper3;
+	b2Body* heartBumperRight;
+	b2Body* heartBumperLeft;
+
+	b2Body* Slingshot1;
+	b2Body* Slingshot2;
+	b2Body* slinghsotLeft;
+	b2Body* slinghsotRight;
 
 	SDL_Texture* background;
 	SDL_Texture* playAgain;

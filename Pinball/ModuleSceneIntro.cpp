@@ -57,81 +57,73 @@ bool ModuleSceneIntro::Start()
 	sensorBluePoint2->listener = this;
 
 	//----------------------BUMPERS---------------------
+
 	//Bumper 1
-	b2BodyDef bumper1;
 	bumper1.type = b2_staticBody;
 	bumper1.position.Set(PIXEL_TO_METERS(232), PIXEL_TO_METERS(88));
-	bumper_1 = App->physics->world->CreateBody(&bumper1);
+	Bumper1 = App->physics->world->CreateBody(&bumper1);
 
-	b2CircleShape shape_bumper1;
-	shape_bumper1.m_radius = PIXEL_TO_METERS(28);
+	b2CircleShape BumperShape1;
+	BumperShape1.m_radius = PIXEL_TO_METERS(28);
 
-	b2FixtureDef f_bumper1;
-	f_bumper1.shape = &shape_bumper1;
-	f_bumper1.restitution = 1, 1;
-	bumper_1->CreateFixture(&f_bumper1);
+	bumperFixture1.shape = &BumperShape1;
+	bumperFixture1.restitution = 1, 1;
+	Bumper1->CreateFixture(&bumperFixture1);
 
 	//Bumper 2
-	b2BodyDef bumper2;
 	bumper2.type = b2_staticBody;
 	bumper2.position.Set(PIXEL_TO_METERS(168), PIXEL_TO_METERS(167));
-	bumper_2 = App->physics->world->CreateBody(&bumper2);
+	Bumper2 = App->physics->world->CreateBody(&bumper2);
 
-	b2CircleShape shape_bumper2;
-	shape_bumper2.m_radius = PIXEL_TO_METERS(28);
+	b2CircleShape BumperShape2;
+	BumperShape2.m_radius = PIXEL_TO_METERS(28);
 
-	b2FixtureDef f_bumper2;
-	f_bumper2.shape = &shape_bumper2;
-	f_bumper2.restitution = 1, 1;
-	bumper_2->CreateFixture(&f_bumper2);
+	bumperFixture2.shape = &BumperShape2;
+	bumperFixture2.restitution = 1, 1;
+	Bumper2->CreateFixture(&bumperFixture2);
 
 	//Bumper 3
-	b2BodyDef bumper3;
 	bumper3.type = b2_staticBody;
 	bumper3.position.Set(PIXEL_TO_METERS(296), PIXEL_TO_METERS(167));
-	bumper_3 = App->physics->world->CreateBody(&bumper3);
+	Bumper3 = App->physics->world->CreateBody(&bumper3);
 
-	b2CircleShape shape_bumper3;
-	shape_bumper3.m_radius = PIXEL_TO_METERS(28);
+	b2CircleShape BumperShape3;
+	BumperShape3.m_radius = PIXEL_TO_METERS(28);
 
-	b2FixtureDef f_bumper3;
-	f_bumper3.shape = &shape_bumper3;
-	f_bumper3.restitution = 1, 1;
-	bumper_3->CreateFixture(&f_bumper3);
+	bumperFixture3.shape = &BumperShape3;
+	bumperFixture3.restitution = 1, 1;
+	Bumper3->CreateFixture(&bumperFixture3);
 
 	//Bumper 4 (right heart)
-	b2BodyDef bumper4;
-	bumper4.type = b2_staticBody;
-	bumper4.position.Set(PIXEL_TO_METERS(392), PIXEL_TO_METERS(560));
-	bumper_4 = App->physics->world->CreateBody(&bumper4);
 
-	b2CircleShape shape_bumper4;
-	shape_bumper4.m_radius = PIXEL_TO_METERS(15);
+	RightHeartBumper.type = b2_staticBody;
+	RightHeartBumper.position.Set(PIXEL_TO_METERS(392), PIXEL_TO_METERS(560));
+	heartBumperRight = App->physics->world->CreateBody(&RightHeartBumper);
 
-	b2FixtureDef f_bumper4;
-	f_bumper4.shape = &shape_bumper4;
-	f_bumper4.restitution = 3;
-	bumper_4->CreateFixture(&f_bumper4);
+	b2CircleShape BumperShape4;
+	BumperShape4.m_radius = PIXEL_TO_METERS(15);
+
+	rightBumperFix.shape = &BumperShape4;
+	rightBumperFix.restitution = 3;
+	heartBumperRight->CreateFixture(&rightBumperFix);
 
 	//Bumper 5 (left heart)
-	b2BodyDef bumper5;
-	bumper5.type = b2_staticBody;
-	bumper5.position.Set(PIXEL_TO_METERS(56), PIXEL_TO_METERS(560));
-	bumper_5 = App->physics->world->CreateBody(&bumper5);
 
-	b2CircleShape shape_bumper5;
-	shape_bumper5.m_radius = PIXEL_TO_METERS(15);
+	LeftHeartBumper.type = b2_staticBody;
+	LeftHeartBumper.position.Set(PIXEL_TO_METERS(56), PIXEL_TO_METERS(560));
+	heartBumperLeft = App->physics->world->CreateBody(&LeftHeartBumper);
 
-	b2FixtureDef f_bumper5;
-	f_bumper5.shape = &shape_bumper5;
-	f_bumper5.restitution = 3;
-	bumper_5->CreateFixture(&f_bumper5);
+	b2CircleShape BumperShape5;
+	BumperShape5.m_radius = PIXEL_TO_METERS(15);
+
+	leftBumperFix.shape = &BumperShape5;
+	leftBumperFix.restitution = 3;
+	heartBumperLeft->CreateFixture(&leftBumperFix);
 
 	//----------------------SLINGSHOTS---------------------
-	//Slingshot 1
-	b2BodyDef slingshot1;
+//Slingshot 1
 	slingshot1.type = b2_staticBody;
-	slingshot_1 = App->physics->world->CreateBody(&slingshot1);
+	Slingshot1 = App->physics->world->CreateBody(&slingshot1);
 
 	b2Vec2 vertices1[5];
 	vertices1[0].Set(PIXEL_TO_METERS(124), PIXEL_TO_METERS(532));
@@ -140,20 +132,18 @@ bool ModuleSceneIntro::Start()
 	vertices1[3].Set(PIXEL_TO_METERS(132), PIXEL_TO_METERS(494));
 	vertices1[4].Set(PIXEL_TO_METERS(124), PIXEL_TO_METERS(498));
 
-	b2PolygonShape shape_slingshot1;
-	shape_slingshot1.Set(vertices1, 5);
+	b2PolygonShape SlingshotShape1;
+	SlingshotShape1.Set(vertices1, 5);
 
-	b2FixtureDef fixture_slingshot1;
-	fixture_slingshot1.shape = &shape_slingshot1;
+	leftSlingshotFix.shape = &SlingshotShape1;
 
-	b2Body* dynamicBody2_l = App->physics->world->CreateBody(&slingshot1);
-	fixture_slingshot1.restitution = 2;
-	dynamicBody2_l->CreateFixture(&fixture_slingshot1); 
-	
+	slinghsotLeft = App->physics->world->CreateBody(&slingshot1);
+	leftSlingshotFix.restitution = 2;
+	slinghsotLeft->CreateFixture(&leftSlingshotFix);
+
 	//Slingshot 2
-	b2BodyDef slingshot2;
-	slingshot2.type = b2_staticBody; 
-	slingshot_2 = App->physics->world->CreateBody(&slingshot2);
+	slingshot2.type = b2_staticBody;
+	Slingshot2 = App->physics->world->CreateBody(&slingshot2);
 
 	b2Vec2 vertices2[5];
 	vertices2[0].Set(PIXEL_TO_METERS(324), PIXEL_TO_METERS(532));
@@ -162,15 +152,14 @@ bool ModuleSceneIntro::Start()
 	vertices2[3].Set(PIXEL_TO_METERS(314), PIXEL_TO_METERS(494));
 	vertices2[4].Set(PIXEL_TO_METERS(324), PIXEL_TO_METERS(496));
 
-	b2PolygonShape shape_slingshot2;
-	shape_slingshot2.Set(vertices2, 5);
+	b2PolygonShape SlingshotShape2;
+	SlingshotShape2.Set(vertices2, 5);
 
-	b2FixtureDef fixture_slingshot2;
-	fixture_slingshot2.shape = &shape_slingshot2;
+	rightSlingshotFix.shape = &SlingshotShape2;
 
-	b2Body* dynamicBody2_2 = App->physics->world->CreateBody(&slingshot2);
-	fixture_slingshot2.restitution = 2;
-	dynamicBody2_2->CreateFixture(&fixture_slingshot2); 
+	slinghsotRight = App->physics->world->CreateBody(&slingshot2);
+	rightSlingshotFix.restitution = 2;
+	slinghsotRight->CreateFixture(&rightSlingshotFix);
 
 	return ret;
 }
